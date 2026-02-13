@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { useSupabase } from '../contexts/SupabaseContext';
+import { useSupabase } from './contexts/SupabaseContext';
 
 export const Login: React.FC = () => {
   const supabase = useSupabase();
