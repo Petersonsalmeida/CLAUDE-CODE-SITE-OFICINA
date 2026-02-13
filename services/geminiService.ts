@@ -4,12 +4,12 @@ import { Product, StockMovement, ParsedNFe } from '../types';
 
 /**
  * Verificador centralizado de API KEY.
+ * Compatível com Netlify, Vercel e Local.
  */
 const getApiKey = () => {
   const key = process.env.API_KEY;
-  // Verifica se a chave é nula, indefinida ou a string literal "undefined" (comum em alguns builds)
   if (!key || key === 'undefined' || key === '' || key === 'null') {
-    throw new Error("API_KEY_NOT_CONFIGURED");
+    throw new Error("API_KEY_MISSING");
   }
   return key;
 };
@@ -45,8 +45,8 @@ export const getStockAnalysis = async (
     return response.text || "Sem resposta da IA.";
   } catch (error: any) {
     console.error("Gemini Error:", error);
-    if (error.message === "API_KEY_NOT_CONFIGURED") {
-      return "ERRO DE CONFIGURAÇÃO: A variável 'API_KEY' não foi encontrada no painel da Netlify. Vá em Site Settings > Environment Variables e adicione a chave do Gemini.";
+    if (error.message === "API_KEY_MISSING") {
+      return "ERRO NA VERCEL: A variável 'API_KEY' não foi configurada. No painel da Vercel, vá em Settings > Environment Variables e adicione a chave do Gemini.";
     }
     return `IA indisponível: ${error.message}`;
   }
@@ -58,7 +58,7 @@ export const parseInvoicePDF = async (pdfBase64: string): Promise<ParsedNFe> => 
         const ai = new GoogleGenAI({ apiKey });
         const model = 'gemini-3-flash-preview';
 
-        const prompt = "Extraia dados da NF-e anexa.";
+        const prompt = "Extraia dados da NF-e anexa em JSON.";
         const pdfPart = { inlineData: { mimeType: 'application/pdf', data: pdfBase64 } };
 
         const response = await ai.models.generateContent({
@@ -96,8 +96,8 @@ export const parseInvoicePDF = async (pdfBase64: string): Promise<ParsedNFe> => 
         if (!response.text) throw new Error("Falha na extração.");
         return JSON.parse(response.text) as ParsedNFe;
     } catch (error: any) {
-        if (error.message === "API_KEY_NOT_CONFIGURED") {
-            throw new Error("Configure a API_KEY no painel de controle da sua hospedagem para importar PDFs.");
+        if (error.message === "API_KEY_MISSING") {
+            throw new Error("Migração Vercel pendente: Adicione a API_KEY nas variáveis de ambiente do projeto.");
         }
         throw error;
     }
