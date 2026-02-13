@@ -55,8 +55,8 @@ export const NFControl: React.FC<NFControlProps> = () => {
         if (sortConfig !== null) {
             sortableItems.sort((a, b) => {
                 const key = sortConfig.key;
-                const valA = a[key];
-                const valB = b[key];
+                const valA = a[key] ?? '';
+                const valB = b[key] ?? '';
                 
                 if (typeof valA === 'object' || typeof valB === 'object') return 0;
 

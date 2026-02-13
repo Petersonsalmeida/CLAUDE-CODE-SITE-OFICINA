@@ -255,9 +255,10 @@ export const StockControl: React.FC<StockControlProps> = ({
         }
     }
 
-    const productsToUpsert = [];
-    const movementsToInsert = [];
-    const pricesToInsert = [];
+    const productsToUpsert: any[] = [];
+    const movementsToInsert: any[] = [];
+    const pricesToInsert: any[] = [];
+    const now = new Date().toISOString();
 
     for (const nfeProd of nfeData.products) {
         const existingProduct = products.find(p => p.id === nfeProd.code);
@@ -280,16 +281,17 @@ export const StockControl: React.FC<StockControlProps> = ({
             pricesToInsert.push({
                 product_id: nfeProd.code,
                 price: nfeProd.unit_price,
-                date: new Date().toISOString(),
+                date: now,
             });
         }
         
         movementsToInsert.push({
             product_id: nfeProd.code,
             product_name: nfeProd.name,
-            type: 'in' as const,
+            type: 'in',
             quantity: nfeProd.quantity,
             reason: `NF-e ${nfeData.supplier.cnpj}`,
+            date: now
         });
     }
     
@@ -327,7 +329,7 @@ export const StockControl: React.FC<StockControlProps> = ({
         supplier: nfeData.supplier,
         products: nfeData.products,
         total_value: totalValue,
-        import_date: new Date().toISOString(),
+        import_date: now,
     };
     await addNf(newNf);
 
