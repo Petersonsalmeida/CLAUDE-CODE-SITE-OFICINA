@@ -1,0 +1,7 @@
+{
+  "name": "Sistema de Controle de Estoque Inteligente",
+  "description": "Uma aplicação web completa para gerenciamento de estoque com importação de NF-e (XML), controle de saídas, cadastros de fornecedores e funcionários, e um assistente de IA para análise de dados.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
