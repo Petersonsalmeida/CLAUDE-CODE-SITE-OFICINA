@@ -341,11 +341,18 @@ export const StockControl: React.FC<StockControlProps> = ({
   };
 
   const columns = [
-    { header: 'ID', accessor: 'id' as const, sortable: true },
-    { header: 'Nome', accessor: 'name' as const, sortable: true },
-    { header: 'Qtd', accessor: (item: Product) => item.quantity.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 3 }), sortable: true, sortKey: 'quantity' as const },
-    { header: 'Preço', accessor: (item: Product) => item.unit_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), sortable: true, sortKey: 'unit_price' as const },
-    { header: 'Mínimo', accessor: 'min_stock' as const, sortable: true },
+    { header: 'ID', accessor: 'id' as const, sortable: true, hiddenMobile: true },
+    { header: 'Nome', accessor: 'name' as const, sortable: true, className: "font-medium" },
+    { header: 'Qtd', accessor: (item: Product) => (
+        <div className="flex flex-col">
+            <span className="font-black text-gray-900 dark:text-white">
+                {item.quantity.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 3 })}
+            </span>
+            <span className="text-[10px] md:hidden text-gray-500 uppercase font-bold">Saldo</span>
+        </div>
+    ), sortable: true, sortKey: 'quantity' as const },
+    { header: 'Preço', accessor: (item: Product) => item.unit_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), sortable: true, sortKey: 'unit_price' as const, hiddenMobile: true },
+    { header: 'Mínimo', accessor: 'min_stock' as const, sortable: true, hiddenMobile: true },
   ];
 
   const formInputClass = "w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200";
@@ -377,18 +384,9 @@ export const StockControl: React.FC<StockControlProps> = ({
                     Excluir ({selectedIds.length})
                 </button>
             )}
-            <label className={`bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition flex items-center cursor-pointer shadow-lg ${isProcessingIA ? 'opacity-50 pointer-events-none' : ''}`}>
-                {isProcessingIA ? (
-                    <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                ) : (
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
-                )}
-                Importar Cupom (IA)
-                <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleImportCupom} disabled={isProcessingIA} />
-            </label>
-            <label className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition flex items-center cursor-pointer shadow-lg">
+            <label className={`bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition flex items-center cursor-pointer shadow-lg`}>
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                XML NFe
+                Importar XML
                 <input type="file" accept=".xml" className="hidden" onChange={handleImportXML} />
             </label>
             <button onClick={() => setIsScannerOpen(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center shadow-lg">
@@ -407,7 +405,7 @@ export const StockControl: React.FC<StockControlProps> = ({
           placeholder="Buscar por nome ou ID..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+          className="w-full pl-10 pr-4 py-3 border rounded-xl dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 focus:ring-2 focus:ring-primary/20 transition-all outline-none shadow-sm"
         />
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -422,13 +420,12 @@ export const StockControl: React.FC<StockControlProps> = ({
         selectedItems={selectedIds}
         setSelectedItems={setSelectedIds}
         actions={(product) => (
-          <div className="flex space-x-2">
-            <button onClick={() => { setCurrentProduct(product); setStockAction('in'); setStockQuantity(1); setIsStockModalOpen(true); }} title="Entrada" className="text-green-600 hover:bg-green-100 p-1.5 rounded-full transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg></button>
-            <button onClick={() => { setCurrentProduct(product); setStockAction('out'); setStockQuantity(1); setIsStockModalOpen(true); }} title="Saída" className="text-amber-600 hover:bg-amber-100 p-1.5 rounded-full transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4"></path></svg></button>
-            <button onClick={() => viewPriceHistory(product)} title="Histórico de Preço" className="text-purple-600 hover:bg-purple-100 p-1.5 rounded-full transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></button>
-            <button onClick={() => { setCurrentProduct(product); setIsQrModalOpen(true); }} title="QR Code" className="text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg></button>
-            <button onClick={() => { setCurrentProduct(product); setIsProductModalOpen(true); }} title="Editar" className="text-indigo-600 hover:text-indigo-100 p-1.5 rounded-full transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
-            <button onClick={() => handleDelete(product)} title="Excluir" className="text-red-600 hover:bg-red-100 p-1.5 rounded-full transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+          <div className="flex space-x-1">
+            <button onClick={() => { setCurrentProduct(product); setStockAction('in'); setStockQuantity(1); setIsStockModalOpen(true); }} title="Entrada" className="text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 p-2 rounded-lg transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg></button>
+            <button onClick={() => { setCurrentProduct(product); setStockAction('out'); setStockQuantity(1); setIsStockModalOpen(true); }} title="Saída" className="text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/30 p-2 rounded-lg transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4"></path></svg></button>
+            <button onClick={() => { setCurrentProduct(product); setIsQrModalOpen(true); }} title="QR Code" className="text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/30 p-2 rounded-lg transition hidden md:block"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg></button>
+            <button onClick={() => { setCurrentProduct(product); setIsProductModalOpen(true); }} title="Editar" className="text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 p-2 rounded-lg transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
+            <button onClick={() => handleDelete(product)} title="Excluir" className="text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 p-2 rounded-lg transition"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
           </div>
         )}
       />

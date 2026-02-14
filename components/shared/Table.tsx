@@ -7,7 +7,14 @@ export type SortConfig<T> = {
 } | null;
 
 interface TableProps<T> {
-    columns: { header: string; accessor: keyof T | ((item: T) => ReactNode); sortable?: boolean; sortKey?: keyof T }[];
+    columns: { 
+        header: string; 
+        accessor: keyof T | ((item: T) => ReactNode); 
+        sortable?: boolean; 
+        sortKey?: keyof T;
+        hiddenMobile?: boolean; // Nova propriedade para ocultar no mobile
+        className?: string;     // Nova propriedade para estilos customizados
+    }[];
     data: T[];
     actions?: (item: T) => ReactNode;
     sortConfig: SortConfig<T>;
@@ -47,26 +54,30 @@ export const Table = <T extends { id: string }>(
     };
     
     return (
-        <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-700/50">
                     <tr>
                         {setSelectedItems && (
-                             <th scope="col" className="px-6 py-3">
+                             <th scope="col" className="px-4 py-3 w-10">
                                 <input 
                                     type="checkbox" 
-                                    className="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-900 dark:checked:bg-primary"
+                                    className="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-900"
                                     onChange={handleSelectAll}
                                     checked={selectedItems && data.length > 0 && selectedItems.length === data.length}
                                 />
                             </th>
                         )}
                         {columns.map((col, index) => (
-                            <th key={index} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th 
+                                key={index} 
+                                scope="col" 
+                                className={`px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider ${col.hiddenMobile ? 'hidden md:table-cell' : ''}`}
+                            >
                                 {col.sortable ? (
-                                    <button onClick={() => requestSort((col.sortKey || col.accessor) as keyof T)} className="flex items-center space-x-1">
+                                    <button onClick={() => requestSort((col.sortKey || col.accessor) as keyof T)} className="flex items-center space-x-1 hover:text-primary transition-colors">
                                         <span>{col.header}</span>
-                                        <span>{getSortIndicator((col.sortKey || col.accessor) as keyof T)}</span>
+                                        <span className="text-[10px] opacity-70">{getSortIndicator((col.sortKey || col.accessor) as keyof T)}</span>
                                     </button>
                                 ) : (
                                     col.header
@@ -74,35 +85,38 @@ export const Table = <T extends { id: string }>(
                             </th>
                         ))}
                         {actions && (
-                            <th scope="col" className="sticky right-0 bg-gray-50 dark:bg-gray-700 px-6 py-3 text-right">
-                                <span className="text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</span>
+                            <th scope="col" className="sticky right-0 bg-gray-50 dark:bg-gray-700 px-4 py-3 text-right w-20">
+                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ações</span>
                             </th>
                         )}
                     </tr>
                 </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
                     {data.length > 0 ? data.map((item) => (
-                        <tr key={item.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedItems?.includes(item.id) ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}>
+                        <tr key={item.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors ${selectedItems?.includes(item.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}>
                              {setSelectedItems && (
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className="px-4 py-4">
                                      <input 
                                         type="checkbox" 
-                                        className="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-900 dark:checked:bg-primary"
+                                        className="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-900"
                                         checked={selectedItems?.includes(item.id)}
                                         onChange={() => handleSelectItem(item.id)}
                                     />
                                 </td>
                             )}
                             {columns.map((col, index) => (
-                                <td key={index} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                <td 
+                                    key={index} 
+                                    className={`px-4 py-4 text-sm text-gray-700 dark:text-gray-300 ${col.hiddenMobile ? 'hidden md:table-cell' : ''} ${col.className || ''}`}
+                                >
                                     {typeof col.accessor === 'function'
                                         ? col.accessor(item)
                                         : (item[col.accessor] as ReactNode)}
                                 </td>
                             ))}
                             {actions && (
-                                <td className="sticky right-0 bg-white dark:bg-gray-800 px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div className="flex items-center justify-end space-x-2">
+                                <td className="sticky right-0 bg-white dark:bg-gray-800 px-4 py-4 text-right">
+                                    <div className="flex items-center justify-end space-x-1">
                                         {actions(item)}
                                     </div>
                                 </td>
@@ -110,8 +124,11 @@ export const Table = <T extends { id: string }>(
                         </tr>
                     )) : (
                         <tr>
-                           <td colSpan={columns.length + (actions ? 1 : 0) + (setSelectedItems ? 1: 0)} className="text-center py-10 text-gray-500 dark:text-gray-400">
-                                Nenhum dado encontrado.
+                           <td colSpan={columns.length + (actions ? 1 : 0) + (setSelectedItems ? 1: 0)} className="text-center py-16 text-gray-500 dark:text-gray-400">
+                                <div className="flex flex-col items-center">
+                                    <svg className="w-12 h-12 mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                    Nenhum dado encontrado.
+                                </div>
                            </td>
                         </tr>
                     )}
