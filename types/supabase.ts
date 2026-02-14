@@ -314,6 +314,7 @@ export interface Database {
           product_id: string
           price: number
           date: string
+          supplier_name: string | null
           organization_id: string | null
         }
         Insert: {
@@ -321,7 +322,8 @@ export interface Database {
           user_id?: string
           product_id: string
           price: number
-          date: string
+          date?: string
+          supplier_name?: string | null
           organization_id?: string | null
         }
         Update: {
@@ -330,6 +332,7 @@ export interface Database {
           product_id?: string
           price?: number
           date?: string
+          supplier_name?: string | null
           organization_id?: string | null
         }
         Relationships: []
