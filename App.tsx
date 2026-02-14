@@ -31,10 +31,8 @@ const App: React.FC = () => {
   const [supabaseUrl] = useLocalStorage<string | null>('supabaseUrl', null);
   const [supabaseKey] = useLocalStorage<string | null>('supabaseKey', null);
   
-  // Track configuration state
   const [isConfigured, setIsConfigured] = useState(!!(supabaseUrl && supabaseKey));
 
-  // Initialize Supabase Client
   const [supabaseClient, setSupabaseClient] = useState(() => {
     if (supabaseUrl && supabaseKey) {
         try {
@@ -56,7 +54,6 @@ const App: React.FC = () => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; message: string; onConfirm: () => void } | null>(null);
 
-  // Sync client when configuration changes
   useEffect(() => {
     if (isConfigured && supabaseUrl && supabaseKey) {
       try {
@@ -69,17 +66,13 @@ const App: React.FC = () => {
     }
   }, [isConfigured, supabaseUrl, supabaseKey]);
 
-  // Auth and Profile sync
   useEffect(() => {
     if (!supabaseClient) return;
 
-    const initAuth = async () => {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        setSession(session);
-        if (session?.user) fetchProfile(session.user.id);
-    };
-
-    initAuth();
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) fetchProfile(session.user.id);
+    });
 
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
       setSession(session);
@@ -104,8 +97,8 @@ const App: React.FC = () => {
         name: data.full_name,
         email: session?.user?.email,
         role: data.role as UserRole,
-        organization_id: data.organization_id,
-        avatar_url: data.avatar_url
+        organization_id: data.organization_id ?? undefined, // Fix TS error null -> undefined
+        avatar_url: data.avatar_url ?? undefined // Fix TS error null -> undefined
       });
     }
   };
@@ -135,12 +128,10 @@ const App: React.FC = () => {
     if (supabaseClient) await supabaseClient.auth.signOut();
   };
 
-  // 1. If not configured, show setup
   if (!isConfigured || !supabaseClient) {
     return <SupabaseSetup onConfigured={() => setIsConfigured(true)} />;
   }
 
-  // 2. If configured but no session, show login (MUST wrap in Provider here)
   if (!session) {
     return (
       <SupabaseProvider client={supabaseClient}>
@@ -149,7 +140,6 @@ const App: React.FC = () => {
     );
   }
 
-  // 3. Main App render
   const renderPage = () => {
     const props = { addToast, showConfirmation, addActivityLog, currentUser: currentUser! };
     switch (currentPage) {

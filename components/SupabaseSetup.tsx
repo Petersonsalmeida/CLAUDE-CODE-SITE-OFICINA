@@ -18,15 +18,11 @@ export const SupabaseSetup: React.FC<SupabaseSetupProps> = ({ onConfigured }) =>
     }
     
     try {
-        // Validate URL format roughly
         new URL(url);
-        
         setError('');
-        // Store as JSON strings to match useLocalStorage expectations
+        // Salva como string JSON
         localStorage.setItem('supabaseUrl', JSON.stringify(url.trim()));
         localStorage.setItem('supabaseKey', JSON.stringify(key.trim()));
-        
-        // Signal configuration completion
         onConfigured();
     } catch (err) {
         setError('URL inválida. Certifique-se de incluir http:// ou https://');

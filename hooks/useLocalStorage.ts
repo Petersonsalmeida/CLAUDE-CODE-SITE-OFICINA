@@ -8,11 +8,10 @@ export function useLocalStorage<T,>(key: string, initialValue: T): [T, React.Dis
       if (item === null) return initialValue;
       
       try {
-        // Try parsing as JSON first
+        // Tenta parsear como JSON
         return JSON.parse(item);
       } catch (e) {
-        // If parsing fails (e.g. it's a raw string like a URL), 
-        // return the item as-is if the expected type is string
+        // Se falhar (ex: é uma URL ou Token puro), retorna como string se T permitir
         return item as unknown as T;
       }
     } catch (error) {
@@ -23,7 +22,6 @@ export function useLocalStorage<T,>(key: string, initialValue: T): [T, React.Dis
 
   useEffect(() => {
     try {
-      // Handle functional updates if any, though usually not needed here
       const valueToStore = storedValue instanceof Function ? storedValue(storedValue) : storedValue;
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
