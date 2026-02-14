@@ -126,7 +126,29 @@ export const StockControl: React.FC<StockControlProps> = ({
       
       setIsProcessingIA(true);
       try {
-          // Registrar a Nota Fiscal
+          // 0. Verificar/Cadastrar Fornecedor automaticamente
+          const { data: existingSupplier } = await supabase
+              .from('suppliers')
+              .select('id')
+              .eq('cnpj', pendingImport.supplier.cnpj)
+              .maybeSingle();
+
+          if (!existingSupplier) {
+              const { error: supplierError } = await supabase.from('suppliers').insert({
+                  name: pendingImport.supplier.name,
+                  cnpj: pendingImport.supplier.cnpj,
+                  contact: 'Cadastrado via Importação'
+              });
+              
+              if (supplierError) {
+                  console.warn("Erro ao cadastrar fornecedor novo:", supplierError.message);
+                  // Não barramos a importação por isso, apenas logamos
+              } else {
+                  addActivityLog(`cadastrou automaticamente o fornecedor ${pendingImport.supplier.name} via importação.`);
+              }
+          }
+
+          // 1. Registrar a Nota Fiscal
           const { error: nfError } = await supabase.from('nfs').insert({
               supplier: { ...pendingImport.supplier, access_key: pendingImport.access_key || null } as any,
               products: pendingImport.products as any,
