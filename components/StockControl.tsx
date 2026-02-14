@@ -343,12 +343,22 @@ export const StockControl: React.FC<StockControlProps> = ({
   const columns = [
     { header: 'ID', accessor: 'id' as const, sortable: true },
     { header: 'Nome', accessor: 'name' as const, sortable: true },
-    { header: 'Qtd', accessor: 'quantity' as const, sortable: true },
+    { header: 'Qtd', accessor: (item: Product) => item.quantity.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 3 }), sortable: true, sortKey: 'quantity' as const },
     { header: 'Preço', accessor: (item: Product) => item.unit_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), sortable: true, sortKey: 'unit_price' as const },
     { header: 'Mínimo', accessor: 'min_stock' as const, sortable: true },
   ];
 
   const formInputClass = "w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200";
+
+  const FractionButton = ({ label, value }: { label: string, value: number }) => (
+    <button 
+        type="button"
+        onClick={() => setStockQuantity(value)}
+        className="flex-1 py-2 px-3 bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white dark:hover:bg-primary transition-all rounded-lg text-sm font-bold text-gray-600 dark:text-gray-300"
+    >
+        {label}
+    </button>
+  );
 
   return (
     <div className="space-y-6">
@@ -456,7 +466,7 @@ export const StockControl: React.FC<StockControlProps> = ({
           </div>
       </Modal>
 
-      {/* Outros Modais (Preço, Cadastro, Movimentação, etc) mantidos como no arquivo original */}
+      {/* Histórico de Preços */}
       <Modal isOpen={isPriceHistoryModalOpen} onClose={() => setIsPriceHistoryModalOpen(false)} title={`Histórico de Preços: ${currentProduct?.name}`}>
           <div className="space-y-4">
               <div className="max-h-[400px] overflow-y-auto">
@@ -501,7 +511,7 @@ export const StockControl: React.FC<StockControlProps> = ({
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className="text-[11px] font-bold uppercase text-gray-500 mb-1 block">Qtd Atual</label>
-                    <input type="number" step="0.01" name="quantity" defaultValue={currentProduct?.quantity ?? ''} required className={formInputClass} />
+                    <input type="number" step="0.001" name="quantity" defaultValue={currentProduct?.quantity ?? ''} required className={formInputClass} />
                 </div>
                 <div>
                     <label className="text-[11px] font-bold uppercase text-gray-500 mb-1 block">Mínimo</label>
@@ -512,30 +522,76 @@ export const StockControl: React.FC<StockControlProps> = ({
         </form>
       </Modal>
 
+      {/* MODAL DE MOVIMENTAÇÃO MELHORADO COM ATALHOS DE FRAÇÃO */}
       <Modal isOpen={isStockModalOpen} onClose={() => setIsStockModalOpen(false)} title={`Movimentação: ${currentProduct?.name}`}>
-          <div className="space-y-4">
-              <div className="flex justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-100 dark:border-gray-600">
-                  <span className="text-gray-500 dark:text-gray-400">Estoque Atual</span>
-                  <span className="font-bold text-lg">{currentProduct?.quantity}</span>
+          <div className="space-y-6">
+              {/* Card de Saldo Atual */}
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border dark:border-gray-700 flex justify-between items-center">
+                  <div>
+                      <p className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Estoque em Mãos</p>
+                      <p className="text-2xl font-black text-gray-800 dark:text-white">
+                          {currentProduct?.quantity.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 3 })}
+                      </p>
+                  </div>
+                  <div className={`p-3 rounded-xl ${stockAction === 'in' ? 'bg-green-100 dark:bg-green-900/30 text-green-600' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600'}`}>
+                      {stockAction === 'in' ? (
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path></svg>
+                      ) : (
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path></svg>
+                      )}
+                  </div>
               </div>
+
               <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Quantidade para {stockAction === 'in' ? 'Entrada' : 'Saída'}</label>
-                  <input type="number" value={stockQuantity} onChange={e => setStockQuantity(e.target.value)} min="0.01" step="0.01" className={formInputClass} />
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Quantidade para {stockAction === 'in' ? 'Entrada' : 'Saída'}</label>
+                  <input 
+                      type="number" 
+                      value={stockQuantity} 
+                      onChange={e => setStockQuantity(e.target.value)} 
+                      min="0.001" 
+                      step="0.001" 
+                      placeholder="Ex: 0,68"
+                      className="w-full p-4 text-xl font-bold border-2 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100" 
+                  />
+                  
+                  {/* BOTÕES DE FRAÇÃO RÁPIDA */}
+                  <div className="flex flex-wrap gap-2 mt-3">
+                      <FractionButton label="1/4" value={0.25} />
+                      <FractionButton label="1/2" value={0.50} />
+                      <FractionButton label="3/4" value={0.75} />
+                      <FractionButton label="1 un" value={1.00} />
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-2 italic">Dica: Use os atalhos acima ou digite manualmente.</p>
               </div>
+
               {stockAction === 'out' && (
-                  <div className="space-y-4">
+                  <div className="space-y-4 animate-fade-in">
                     <div>
                         <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Funcionário Responsável</label>
                         <select value={stockEmployeeId} onChange={e => setStockEmployeeId(e.target.value)} className={formInputClass}>
-                            <option value="">Selecione...</option>
+                            <option value="">Selecione quem está retirando...</option>
                             {employees.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Vincular à Ordem de Serviço (Opcional)</label>
+                        <select value={stockWorkOrderId} onChange={e => setStockWorkOrderId(e.target.value)} className={formInputClass}>
+                            <option value="">Nenhuma / Uso Geral na Oficina</option>
+                            {workOrders.map(wo => <option key={wo.id} value={wo.id}>{wo.title}</option>)}
                         </select>
                     </div>
                   </div>
               )}
-              <button onClick={handleStockAction} className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transition ${stockAction === 'in' ? 'bg-green-600 hover:bg-green-700' : 'bg-amber-600 hover:bg-amber-700'}`}>
-                  Confirmar {stockAction === 'in' ? 'Entrada' : 'Saída'}
-              </button>
+
+              <div className="pt-2">
+                  <button 
+                      onClick={handleStockAction} 
+                      className={`w-full py-4 rounded-2xl font-bold text-white shadow-xl transition-all active:scale-95 flex items-center justify-center space-x-2 ${stockAction === 'in' ? 'bg-green-600 hover:bg-green-700 shadow-green-500/20' : 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/20'}`}
+                  >
+                      <span>Confirmar {stockAction === 'in' ? 'Entrada no Estoque' : 'Saída do Material'}</span>
+                  </button>
+                  <button onClick={() => setIsStockModalOpen(false)} className="w-full mt-2 py-2 text-sm text-gray-500 hover:text-red-500 transition">Cancelar Operação</button>
+              </div>
           </div>
       </Modal>
 
