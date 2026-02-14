@@ -28,10 +28,11 @@ import { SupabaseSetup } from './components/SupabaseSetup';
 import { User, AppNotification, ToastMessage, UserRole } from './types';
 
 const App: React.FC = () => {
-  const [supabaseUrl] = useLocalStorage<string | null>('supabaseUrl', null);
-  const [supabaseKey] = useLocalStorage<string | null>('supabaseKey', null);
+  const [supabaseUrl, setSupabaseUrl] = useLocalStorage<string | null>('supabaseUrl', null);
+  const [supabaseKey, setSupabaseKey] = useLocalStorage<string | null>('supabaseKey', null);
   
-  const [isConfigured, setIsConfigured] = useState(!!(supabaseUrl && supabaseKey));
+  // isConfigured agora é derivado, então ele muda sempre que a URL ou Key mudarem
+  const isConfigured = !!(supabaseUrl && supabaseKey);
 
   const [supabaseClient, setSupabaseClient] = useState(() => {
     if (supabaseUrl && supabaseKey) {
@@ -47,13 +48,33 @@ const App: React.FC = () => {
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [session, setSession] = useState<any>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentPage, setCurrentPage] = useState<any>('dashboard');
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; message: string; onConfirm: () => void } | null>(null);
 
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  // Atualiza o cliente Supabase quando a configuração muda
   useEffect(() => {
     if (isConfigured && supabaseUrl && supabaseKey) {
       try {
@@ -97,8 +118,8 @@ const App: React.FC = () => {
         name: data.full_name,
         email: session?.user?.email,
         role: data.role as UserRole,
-        organization_id: data.organization_id ?? undefined, // Fix TS error null -> undefined
-        avatar_url: data.avatar_url ?? undefined // Fix TS error null -> undefined
+        organization_id: data.organization_id ?? undefined,
+        avatar_url: data.avatar_url ?? undefined
       });
     }
   };
@@ -129,7 +150,14 @@ const App: React.FC = () => {
   };
 
   if (!isConfigured || !supabaseClient) {
-    return <SupabaseSetup onConfigured={() => setIsConfigured(true)} />;
+    return (
+      <SupabaseSetup 
+        onConfigured={(url, key) => {
+          setSupabaseUrl(url);
+          setSupabaseKey(key);
+        }} 
+      />
+    );
   }
 
   if (!session) {
@@ -165,7 +193,7 @@ const App: React.FC = () => {
 
   return (
     <SupabaseProvider client={supabaseClient}>
-      <div className={`${theme === 'dark' ? 'dark' : ''} flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300`}>
+      <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
         <Sidebar 
           currentPage={currentPage} 
           setCurrentPage={setCurrentPage} 

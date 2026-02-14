@@ -98,28 +98,42 @@ export const StockControl: React.FC<StockControlProps> = ({
   const handleProductSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const productData = {
-      id: formData.get('id') as string,
-      name: formData.get('name') as string,
-      unit_price: parseFloat(formData.get('unitPrice') as string),
-      quantity: parseFloat(formData.get('quantity') as string),
-      min_stock: parseFloat(formData.get('minStock') as string),
-    };
+    
+    const name = formData.get('name') as string;
+    const unit_price = parseFloat(formData.get('unitPrice') as string);
+    const quantity = parseFloat(formData.get('quantity') as string);
+    const min_stock = parseFloat(formData.get('minStock') as string);
 
     if (currentProduct?.id) {
-      const { error } = await supabase.from('products').update(productData).eq('id', currentProduct.id);
+      const { error } = await supabase.from('products').update({
+        name,
+        unit_price,
+        quantity,
+        min_stock
+      }).eq('id', currentProduct.id);
+
       if (error) addToast(`Erro ao atualizar: ${error.message}`, 'error');
       else {
         addToast('Produto atualizado!', 'success');
-        addActivityLog(`atualizou o produto ${productData.name}`);
+        addActivityLog(`atualizou o produto ${name}`);
+        await fetchData();
         setIsProductModalOpen(false);
       }
     } else {
-      const { error } = await supabase.from('products').insert(productData);
+      const id = formData.get('id') as string;
+      const { error } = await supabase.from('products').insert({
+        id,
+        name,
+        unit_price,
+        quantity,
+        min_stock
+      });
+
       if (error) addToast(`Erro ao cadastrar: ${error.message}`, 'error');
       else {
         addToast('Produto cadastrado!', 'success');
-        addActivityLog(`cadastrou o produto ${productData.name}`);
+        addActivityLog(`cadastrou o produto ${name}`);
+        await fetchData();
         setIsProductModalOpen(false);
       }
     }
@@ -158,6 +172,7 @@ export const StockControl: React.FC<StockControlProps> = ({
     await supabase.from('stock_movements').insert(movement);
     addToast('Estoque atualizado!', 'success');
     addActivityLog(`${stockAction === 'in' ? 'entrada' : 'saída'} de ${qty}x ${currentProduct.name}`);
+    await fetchData();
     setIsStockModalOpen(false);
   };
 
@@ -169,6 +184,7 @@ export const StockControl: React.FC<StockControlProps> = ({
       else {
         addToast('Produto excluído!', 'success');
         addActivityLog(`excluiu o produto ${product.name}`);
+        await fetchData();
       }
     });
   };
@@ -184,7 +200,32 @@ export const StockControl: React.FC<StockControlProps> = ({
         const xml = event.target?.result as string;
         const parsed = await parseNFeXML(xml);
         
+        // CORREÇÃO: Verificação de duplicidade procurando no campo JSONB do fornecedor
+        const { data: existingNfs } = await supabase
+            .from('nfs')
+            .select('supplier')
+            .contains('supplier', { access_key: parsed.access_key });
+
+        if (existingNfs && existingNfs.length > 0) {
+            addToast(`Esta Nota Fiscal (Chave: ...${parsed.access_key.slice(-10)}) já foi importada anteriormente.`, 'error');
+            return;
+        }
+        
         showConfirmation(`Deseja importar ${parsed.products.length} produtos da NF de ${parsed.supplier.name}?`, async () => {
+            // CORREÇÃO: Inserir sem passar 'id' explicitamente (evita erro UUID) 
+            // e incluir access_key no JSON do fornecedor para controle futuro
+            const { error: nfError } = await supabase.from('nfs').insert({
+                supplier: { ...parsed.supplier, access_key: parsed.access_key } as any,
+                products: parsed.products as any,
+                total_value: parsed.total_value,
+                import_date: new Date().toISOString()
+            });
+
+            if (nfError) {
+                addToast(`Erro ao registrar nota fiscal: ${nfError.message}`, 'error');
+                return;
+            }
+
             for (const p of parsed.products) {
                 const { data: existing } = await supabase.from('products').select('*').eq('id', p.code).maybeSingle();
                 
@@ -214,14 +255,14 @@ export const StockControl: React.FC<StockControlProps> = ({
             }
             addToast('NF Importada com sucesso!', 'success');
             addActivityLog(`importou NF de ${parsed.supplier.name}`);
-            fetchData();
+            await fetchData();
         });
       } catch (err: any) {
         addToast(`Erro ao processar XML: ${err.message}`, 'error');
       }
     };
     reader.readAsText(file);
-    e.target.value = ''; // Reset input
+    e.target.value = ''; 
   };
 
   const columns = [
@@ -295,7 +336,7 @@ export const StockControl: React.FC<StockControlProps> = ({
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className="text-[11px] font-bold uppercase text-gray-500 mb-1 block">ID Interno</label>
-                    <input type="text" name="id" defaultValue={currentProduct?.id || ''} required disabled={!!currentProduct?.id} className={`${formInputClass} bg-gray-50 disabled:text-gray-400`} />
+                    <input type="text" name="id" defaultValue={currentProduct?.id || ''} required disabled={!!currentProduct?.id} className={`${formInputClass} bg-gray-50 dark:bg-gray-900 disabled:text-gray-400`} />
                 </div>
                 <div>
                     <label className="text-[11px] font-bold uppercase text-gray-500 mb-1 block">Preço Custo (R$)</label>

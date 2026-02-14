@@ -82,11 +82,14 @@ export interface NFeProduct {
 export interface NFeSupplier {
   name: string;
   cnpj: string;
+  access_key?: string; // Adicionado para rastrear duplicidade via JSON
 }
 
 export interface ParsedNFe {
+  access_key: string;
   supplier: NFeSupplier;
   products: NFeProduct[];
+  total_value: number;
 }
 
 export interface NFe {

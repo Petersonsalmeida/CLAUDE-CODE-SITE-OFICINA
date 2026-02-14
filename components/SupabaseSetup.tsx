@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 
 interface SupabaseSetupProps {
-  onConfigured: () => void;
+  onConfigured: (url: string, key: string) => void;
 }
 
 export const SupabaseSetup: React.FC<SupabaseSetupProps> = ({ onConfigured }) => {
@@ -20,10 +20,8 @@ export const SupabaseSetup: React.FC<SupabaseSetupProps> = ({ onConfigured }) =>
     try {
         new URL(url);
         setError('');
-        // Salva como string JSON
-        localStorage.setItem('supabaseUrl', JSON.stringify(url.trim()));
-        localStorage.setItem('supabaseKey', JSON.stringify(key.trim()));
-        onConfigured();
+        // Envia para o pai (App.tsx) que usará o setter do useLocalStorage
+        onConfigured(url.trim(), key.trim());
     } catch (err) {
         setError('URL inválida. Certifique-se de incluir http:// ou https://');
     }
