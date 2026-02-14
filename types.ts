@@ -102,7 +102,8 @@ export interface PriceHistory {
   id: string;
   product_id: string;
   price: number;
-  date: string; // Changed from Date to string (ISO format)
+  date: string;
+  supplier_name?: string; // NOVO CAMPO
   user_id?: string;
 }
 
