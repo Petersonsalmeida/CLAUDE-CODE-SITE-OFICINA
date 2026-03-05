@@ -13,7 +13,7 @@ interface ClientsProps {
   currentUser: User;
 }
 
-export const Clients: React.FC<ClientsProps> = ({ addToast, showConfirmation, addActivityLog }) => {
+export const Clients: React.FC<ClientsProps> = ({ addToast, showConfirmation, addActivityLog, currentUser }) => {
     const supabase = useSupabase();
     const [clients, setClients] = useState<Client[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);

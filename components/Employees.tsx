@@ -11,7 +11,7 @@ interface EmployeesProps {
   currentUser: User;
 }
 
-export const Employees: React.FC<EmployeesProps> = ({ addToast, showConfirmation, addActivityLog }) => {
+export const Employees: React.FC<EmployeesProps> = ({ addToast, showConfirmation, addActivityLog, currentUser }) => {
     const supabase = useSupabase();
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);

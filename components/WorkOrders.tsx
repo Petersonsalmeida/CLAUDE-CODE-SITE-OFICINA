@@ -13,7 +13,7 @@ interface WorkOrdersProps {
 }
 
 export const WorkOrders: React.FC<WorkOrdersProps> = ({
-  addToast, showConfirmation, addActivityLog
+  addToast, showConfirmation, addActivityLog, currentUser
 }) => {
   const supabase = useSupabase();
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);

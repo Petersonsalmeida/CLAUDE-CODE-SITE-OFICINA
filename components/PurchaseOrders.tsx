@@ -13,7 +13,7 @@ interface PurchaseOrdersProps {
 }
 
 export const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({
-  addToast, showConfirmation, addActivityLog
+  addToast, showConfirmation, addActivityLog, currentUser
 }) => {
   const supabase = useSupabase();
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([]);

@@ -13,7 +13,7 @@ interface CarPartsProps {
 }
 
 export const CarParts: React.FC<CarPartsProps> = ({ 
-    addToast, showConfirmation, addActivityLog
+    addToast, showConfirmation, addActivityLog, currentUser
 }) => {
   const supabase = useSupabase();
   const [carParts, setCarParts] = useState<CarPart[]>([]);

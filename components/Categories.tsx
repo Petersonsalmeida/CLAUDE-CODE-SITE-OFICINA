@@ -12,7 +12,7 @@ interface CategoriesProps {
   currentUser: User;
 }
 
-export const Categories: React.FC<CategoriesProps> = ({ addToast, showConfirmation, addActivityLog }) => {
+export const Categories: React.FC<CategoriesProps> = ({ addToast, showConfirmation, addActivityLog, currentUser }) => {
     const supabase = useSupabase();
     const [categories, setCategories] = useState<Category[]>([]);
     const [products, setProducts] = useState<Product[]>([]); // Needed for counting

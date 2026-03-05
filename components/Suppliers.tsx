@@ -11,7 +11,7 @@ interface SuppliersProps {
   currentUser: User;
 }
 
-export const Suppliers: React.FC<SuppliersProps> = ({ addToast, showConfirmation, addActivityLog }) => {
+export const Suppliers: React.FC<SuppliersProps> = ({ addToast, showConfirmation, addActivityLog, currentUser }) => {
     const supabase = useSupabase();
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);

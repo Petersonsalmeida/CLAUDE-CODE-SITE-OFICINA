@@ -15,7 +15,7 @@ interface AssetsProps {
   currentUser: User;
 }
 
-export const Assets: React.FC<AssetsProps> = ({ addToast, showConfirmation, addActivityLog }) => {
+export const Assets: React.FC<AssetsProps> = ({ addToast, showConfirmation, addActivityLog, currentUser }) => {
     const supabase = useSupabase();
     const [assets, setAssets] = useState<Asset[]>([]);
     const [maintenanceRecords, setMaintenanceRecords] = useState<MaintenanceRecord[]>([]);

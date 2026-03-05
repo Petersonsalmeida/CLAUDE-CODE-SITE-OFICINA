@@ -11,7 +11,7 @@ interface QuotesProps {
   currentUser: User;
 }
 
-export const Quotes: React.FC<QuotesProps> = ({ addToast, showConfirmation, addActivityLog }) => {
+export const Quotes: React.FC<QuotesProps> = ({ addToast, showConfirmation, addActivityLog, currentUser }) => {
   const supabase = useSupabase();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
