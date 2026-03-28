@@ -62,14 +62,7 @@ $category = htmlspecialchars($_GET['cat'] ?? '', ENT_QUOTES, 'UTF-8');
   <nav id="navbar" class="scrolled">
     <div class="nav-inner">
       <a href="/" class="nav-logo" aria-label="Aliança Centro Automotivo">
-        <svg class="nav-shield" width="26" height="32" viewBox="0 0 26 32" fill="none">
-          <path d="M13 1 L24 5 L24 17 Q24 26 13 30 Q2 26 2 17 L2 5 Z" stroke="#CC1A1A" stroke-width="1.6" fill="none"/>
-          <path d="M7 15 Q9 11 13 10 Q17 9 19 13" stroke="#CC1A1A" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.8"/>
-        </svg>
-        <div class="nav-logo-text">
-          <span class="nlt-brand">ALIANÇA</span>
-          <span class="nlt-sub">CENTRO AUTOMOTIVO</span>
-        </div>
+        <img src="/assets/images/logo-white.png" alt="Aliança Centro Automotivo" class="nav-logo-img" height="46">
       </a>
       <ul class="nav-links">
         <li><a href="/#servicos">Serviços</a></li>
