@@ -62,7 +62,7 @@ $category = htmlspecialchars($_GET['cat'] ?? '', ENT_QUOTES, 'UTF-8');
   <nav id="navbar" class="scrolled">
     <div class="nav-inner">
       <a href="/" class="nav-logo" aria-label="Aliança Centro Automotivo">
-        <img src="/assets/images/logo-white.png" alt="Aliança Centro Automotivo" class="nav-logo-img" height="46">
+        <img src="/assets/images/logo-red.png" alt="Aliança Centro Automotivo" class="nav-logo-img" height="46">
       </a>
       <ul class="nav-links">
         <li><a href="/#servicos">Serviços</a></li>
