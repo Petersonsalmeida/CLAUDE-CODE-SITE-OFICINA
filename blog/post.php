@@ -93,9 +93,15 @@ if ($post && is_dir(__DIR__ . '/../data/posts/')) {
 
   <nav id="navbar" class="scrolled">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#D83B21" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" fill="#f5f5f7" font-size="7.5" font-family="Inter" font-weight="700">ACA</text></svg>
-        <span>Aliança<em>.</em></span>
+      <a href="/" class="nav-logo" aria-label="Aliança Centro Automotivo">
+        <svg class="nav-shield" width="26" height="32" viewBox="0 0 26 32" fill="none">
+          <path d="M13 1 L24 5 L24 17 Q24 26 13 30 Q2 26 2 17 L2 5 Z" stroke="#CC1A1A" stroke-width="1.6" fill="none"/>
+          <path d="M7 15 Q9 11 13 10 Q17 9 19 13" stroke="#CC1A1A" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.8"/>
+        </svg>
+        <div class="nav-logo-text">
+          <span class="nlt-brand">ALIANÇA</span>
+          <span class="nlt-sub">CENTRO AUTOMOTIVO</span>
+        </div>
       </a>
       <ul class="nav-links">
         <li><a href="/#servicos">Serviços</a></li>
@@ -137,7 +143,7 @@ if ($post && is_dir(__DIR__ . '/../data/posts/')) {
     <img class="post-cover" src="<?= htmlspecialchars($post['image']) ?>" alt="<?= htmlspecialchars($post['title']) ?>">
     <?php else: ?>
     <div class="post-cover-placeholder">
-      <svg width="60" height="60" viewBox="0 0 60 60" fill="none"><path d="M5 45 L18 22 L28 34 L38 18 L55 45Z" fill="#D83B21" opacity="0.2"/><circle cx="42" cy="16" r="6" fill="#D83B21" opacity="0.3"/></svg>
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none"><path d="M5 45 L18 22 L28 34 L38 18 L55 45Z" fill="#CC1A1A" opacity="0.2"/><circle cx="42" cy="16" r="6" fill="#CC1A1A" opacity="0.3"/></svg>
     </div>
     <?php endif; ?>
   </section>

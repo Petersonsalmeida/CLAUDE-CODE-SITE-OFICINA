@@ -61,9 +61,15 @@ $category = htmlspecialchars($_GET['cat'] ?? '', ENT_QUOTES, 'UTF-8');
   <!-- NAV -->
   <nav id="navbar" class="scrolled">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#D83B21" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" fill="#f5f5f7" font-size="7.5" font-family="Inter" font-weight="700">ACA</text></svg>
-        <span>Aliança<em>.</em></span>
+      <a href="/" class="nav-logo" aria-label="Aliança Centro Automotivo">
+        <svg class="nav-shield" width="26" height="32" viewBox="0 0 26 32" fill="none">
+          <path d="M13 1 L24 5 L24 17 Q24 26 13 30 Q2 26 2 17 L2 5 Z" stroke="#CC1A1A" stroke-width="1.6" fill="none"/>
+          <path d="M7 15 Q9 11 13 10 Q17 9 19 13" stroke="#CC1A1A" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.8"/>
+        </svg>
+        <div class="nav-logo-text">
+          <span class="nlt-brand">ALIANÇA</span>
+          <span class="nlt-sub">CENTRO AUTOMOTIVO</span>
+        </div>
       </a>
       <ul class="nav-links">
         <li><a href="/#servicos">Serviços</a></li>
@@ -138,7 +144,7 @@ $category = htmlspecialchars($_GET['cat'] ?? '', ENT_QUOTES, 'UTF-8');
                 <img class="blog-card-img" src="<?= htmlspecialchars($p['image']) ?>" alt="<?= htmlspecialchars($p['title']) ?>" loading="lazy">
               <?php else: ?>
                 <div style="aspect-ratio:16/9;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center">
-                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="4" fill="transparent"/><path d="M5 30 L12 18 L18 24 L25 14 L35 30Z" fill="#D83B21" opacity="0.3"/></svg>
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="4" fill="transparent"/><path d="M5 30 L12 18 L18 24 L25 14 L35 30Z" fill="#CC1A1A" opacity="0.3"/></svg>
                 </div>
               <?php endif; ?>
             </div>

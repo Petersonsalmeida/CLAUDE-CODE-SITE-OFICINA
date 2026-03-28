@@ -19,21 +19,21 @@ let lenis;
 (function initLenis() {
   if (typeof Lenis === 'undefined') return;
   lenis = new Lenis({
-    duration: 1.2,
+    duration: 1.0,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    smooth: true,
+    smoothWheel: true,
+    wheelMultiplier: 0.8,
+    touchMultiplier: 1.5,
   });
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
-  requestAnimationFrame(raf);
-
-  // Connect Lenis to GSAP ScrollTrigger
-  if (typeof ScrollTrigger !== 'undefined') {
-    lenis.on('scroll', ScrollTrigger.update);
+  // Use ONLY GSAP ticker — no separate RAF loop to avoid double-call
+  if (typeof gsap !== 'undefined') {
     gsap.ticker.add((time) => { lenis.raf(time * 1000); });
     gsap.ticker.lagSmoothing(0);
+  } else {
+    (function raf(time) { lenis.raf(time); requestAnimationFrame(raf); })(0);
+  }
+  if (typeof ScrollTrigger !== 'undefined') {
+    lenis.on('scroll', ScrollTrigger.update);
   }
 })();
 
@@ -42,32 +42,24 @@ let lenis;
   if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
   gsap.registerPlugin(ScrollTrigger);
 
-  /* ---- Hero text animation (char-by-char reveal) ---- */
-  const heroLines = document.querySelectorAll('.hero-line');
-  heroLines.forEach((line, i) => {
-    gsap.fromTo(line,
-      { opacity: 0, y: 40, filter: 'blur(8px)' },
-      {
-        opacity: 1, y: 0, filter: 'blur(0px)',
-        duration: 0.9,
-        ease: 'power3.out',
-        delay: 1.5 + i * 0.15,
-      }
-    );
+  /* ---- Hero V2 animation ---- */
+  // Stagger hero title lines
+  document.querySelectorAll('.hh-line').forEach((line, i) => {
+    gsap.to(line, {
+      opacity: 1, y: 0,
+      duration: 0.85,
+      ease: 'power3.out',
+      delay: 1.6 + i * 0.15,
+    });
   });
-
-  /* ---- Generic reveal-fade items ---- */
-  document.querySelectorAll('.reveal-fade').forEach(el => {
-    const delay = parseFloat(el.dataset.delay || 0) * 0.12;
-    gsap.fromTo(el,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: 0.8,
-        ease: 'power2.out',
-        delay: 1.5 + delay,
-      }
-    );
+  gsap.fromTo('.hero-kicker',  { opacity:0, y:14 }, { opacity:1, y:0, duration:0.65, ease:'power2.out', delay:1.5 });
+  gsap.fromTo('.hero-desc',    { opacity:0, y:18 }, { opacity:1, y:0, duration:0.65, ease:'power2.out', delay:2.0 });
+  gsap.fromTo('.hero-actions', { opacity:0, y:18 }, { opacity:1, y:0, duration:0.65, ease:'power2.out', delay:2.15 });
+  gsap.fromTo('.hero-emblem',  { opacity:0, scale:0.88 }, { opacity:1, scale:1, duration:1.1, ease:'back.out(1.4)', delay:1.75 });
+  gsap.fromTo('.emblem-ring--outer', { opacity:0 }, { opacity:1, duration:1.2, delay:2.0 });
+  gsap.fromTo('.emblem-ring--inner', { opacity:0 }, { opacity:1, duration:1.2, delay:2.2 });
+  document.querySelectorAll('.hero-stat').forEach((el, i) => {
+    gsap.to(el, { opacity:1, y:0, duration:0.55, ease:'power2.out', delay:2.3 + i * 0.15 });
   });
 
   /* ---- Scroll-triggered reveals ---- */
