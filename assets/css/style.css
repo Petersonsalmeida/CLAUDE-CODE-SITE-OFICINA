@@ -200,14 +200,18 @@ address { font-style: normal; }
   background: rgba(0,0,0,0.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.4s ease, visibility 0.4s;
 }
-.mobile-overlay.open { opacity: 1; visibility: visible; }
+.mobile-overlay.open {
+  display: flex;
+  animation: overlay-in 0.35s ease forwards;
+}
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 .mobile-nav { text-align: center; }
 .mobile-nav ul { display: flex; flex-direction: column; gap: 28px; margin-bottom: 40px; }
 .mobile-nav ul a { font-size: 28px; font-weight: 600; color: var(--text-2); transition: color 0.2s; }

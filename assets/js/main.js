@@ -398,13 +398,16 @@ let lenis;
   if (!burger || !overlay) return;
 
   function toggle() {
-    const isOpen = overlay.classList.toggle('open');
+    const isOpen = !overlay.classList.contains('open');
+    overlay.classList.toggle('open', isOpen);
+    overlay.style.display = isOpen ? 'flex' : 'none';
     burger.classList.toggle('open', isOpen);
     burger.setAttribute('aria-expanded', isOpen);
     document.body.style.overflow = isOpen ? 'hidden' : '';
   }
   function close() {
     overlay.classList.remove('open');
+    overlay.style.display = 'none';
     burger.classList.remove('open');
     burger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
