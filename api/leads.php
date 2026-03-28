@@ -57,8 +57,8 @@ if ($fh) {
 }
 
 // ---- Send notification email ----
-$toEmail   = defined('OWNER_EMAIL')  ? OWNER_EMAIL  : 'comercial@centroautoalianca.com.br';
-$fromEmail = defined('FROM_EMAIL')   ? FROM_EMAIL   : 'noreply@centroautoalianca.com.br';
+$toEmail   = defined('LEAD_EMAIL')    ? LEAD_EMAIL    : (defined('COMPANY_EMAIL') ? COMPANY_EMAIL : 'comercial@centroautoalianca.com.br');
+$fromEmail = defined('COMPANY_EMAIL') ? COMPANY_EMAIL : 'noreply@centroautoalianca.com.br';
 
 $subject = "Novo orçamento: {$nome} — {$servico}";
 $body = "Novo pedido de orçamento recebido:\n\n"
@@ -75,6 +75,23 @@ $headers .= "Reply-To: {$email}\r\n";
 $headers .= "X-Mailer: PHP/" . phpversion();
 
 @mail($toEmail, $subject, $body, $headers);
+
+// ---- Webhook n8n (opcional) ----
+if (defined('N8N_LEAD_WEBHOOK') && N8N_LEAD_WEBHOOK) {
+    $payload = json_encode([
+        'nome' => $nome, 'whatsapp' => $whatsapp, 'email' => $email,
+        'servico' => $servico, 'mensagem' => $mensagem,
+        'data' => date('Y-m-d H:i:s'),
+    ]);
+    $ctx = stream_context_create(['http' => [
+        'method'  => 'POST',
+        'header'  => "Content-Type: application/json\r\n",
+        'content' => $payload,
+        'timeout' => 5,
+        'ignore_errors' => true,
+    ]]);
+    @file_get_contents(N8N_LEAD_WEBHOOK, false, $ctx);
+}
 
 // ---- Respond ----
 http_response_code(200);

@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $configFile = __DIR__ . '/../config.php';
     if (file_exists($configFile)) require_once $configFile;
 
-    $expectedKey = defined('BLOG_API_KEY') ? BLOG_API_KEY : 'change-me-in-config';
+    $expectedKey = defined('BLOG_API_TOKEN') ? BLOG_API_TOKEN : (defined('BLOG_API_KEY') ? BLOG_API_KEY : 'change-me-in-config');
     $sentKey     = $_SERVER['HTTP_X_API_KEY'] ?? '';
     if (!hash_equals($expectedKey, $sentKey)) {
         http_response_code(401);
