@@ -1,61 +1,746 @@
-
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#1f2937" media="(prefers-color-scheme: dark)" />
-    <title>Controle de Estoque Inteligente</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      // Aplica o tema escuro imediatamente se estiver salvo no localStorage
-      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aliança Centro Automotivo | Chapeação e Pintura em Porto Alegre</title>
+  <meta name="description" content="Especialistas em chapeação, pintura automotiva, martelinho de ouro, espelhamento e vitrificação em Porto Alegre. Orçamento em até 2 horas.">
+  <meta name="keywords" content="chapeação Porto Alegre, pintura automotiva, martelinho de ouro, vitrificação, oficina Porto Alegre, centro automotivo">
+  <meta name="author" content="Aliança Centro Automotivo">
+  <link rel="canonical" href="https://centroautoalianca.com.br/">
 
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              'primary': '#1e40af',
-              'secondary': '#1d4ed8',
-              'accent': '#3b82f6',
-              'neutral': '#1f2937',
-              'base-100': '#f9fafb',
-              'info': '#2563eb',
-              'success': '#16a34a',
-              'warning': '#f59e0b',
-              'error': '#dc2626',
-            },
-          },
-        },
-      }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/heroicons/2.1.3/24/outline/heroicons.min.css" integrity="sha512-VbT2yO7xMUrwG64oNwdWcWb3SGNgrifXmFh57k9V2jQcK2o7iTj+4AjFccBvjOghbNIP4Y48vIu0hcvVvGq2GA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4",
-    "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "recharts": "https://esm.sh/recharts@^3.7.0",
-    "vite": "https://esm.sh/vite@^7.3.1",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.4",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.95.3",
-    "html5-qrcode": "https://esm.sh/html5-qrcode@^2.3.8"
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://centroautoalianca.com.br/">
+  <meta property="og:title" content="Aliança Centro Automotivo — O cuidado que seu carro merece">
+  <meta property="og:description" content="Especialistas em chapeação, pintura e proteção automotiva em Porto Alegre. Equipe certificada, prazo garantido.">
+  <meta property="og:image" content="https://centroautoalianca.com.br/assets/images/og-cover.jpg">
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AutoRepair",
+    "name": "Aliança Centro Automotivo",
+    "image": "https://centroautoalianca.com.br/assets/images/og-cover.jpg",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Rua Aliança, 70",
+      "addressLocality": "Porto Alegre",
+      "addressRegion": "RS",
+      "postalCode": "91060-010",
+      "addressCountry": "BR"
+    },
+    "telephone": "+55-51-99468-7074",
+    "email": "comercial@centroautoalianca.com.br",
+    "url": "https://centroautoalianca.com.br",
+    "openingHoursSpecification": [
+      {"@type": "OpeningHoursSpecification","dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens": "08:00","closes": "18:20"}
+    ],
+    "priceRange": "$$",
+    "aggregateRating": {"@type": "AggregateRating","ratingValue": "4.9","reviewCount": "127"}
   }
-}
-</script>
+  </script>
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,700&display=swap" rel="stylesheet">
+
+  <!-- GSAP CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Lenis smooth scroll -->
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
-  <body class="bg-base-100 dark:bg-gray-900">
-    <div id="root"></div>
-    <!-- Script de entrada para carregar o React -->
-    <script type="module" src="/index.tsx"></script>
-  </body>
+<body>
+
+  <!-- ===================== LOADER ===================== -->
+  <div id="loader">
+    <svg class="loader-logo" width="56" height="56" viewBox="0 0 56 56" fill="none">
+      <circle cx="28" cy="28" r="26" stroke="#D83B21" stroke-width="1.5" stroke-dasharray="163" stroke-dashoffset="163" class="loader-ring"/>
+      <text x="28" y="33" text-anchor="middle" fill="#f5f5f7" font-size="11" font-family="Inter" font-weight="700" letter-spacing="1">ACA</text>
+    </svg>
+    <div class="loader-bar"><div class="loader-progress"></div></div>
+  </div>
+
+  <!-- ===================== NAV ===================== -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo" aria-label="Aliança Centro Automotivo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14" stroke="#D83B21" stroke-width="1.5"/>
+          <text x="16" y="20" text-anchor="middle" fill="#f5f5f7" font-size="7.5" font-family="Inter" font-weight="700">ACA</text>
+        </svg>
+        <span>Aliança<em>.</em></span>
+      </a>
+      <ul class="nav-links" role="list">
+        <li><a href="#servicos">Serviços</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#depoimentos">Depoimentos</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ul>
+      <a href="#orcamento" class="nav-cta">Orçamento Grátis</a>
+      <button class="nav-burger" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu overlay -->
+  <div class="mobile-overlay" aria-hidden="true">
+    <nav class="mobile-nav">
+      <ul>
+        <li><a href="#servicos">Serviços</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#depoimentos">Depoimentos</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ul>
+      <a href="#orcamento" class="btn btn-primary">Solicitar Orçamento</a>
+    </nav>
+  </div>
+
+  <!-- ===================== HERO ===================== -->
+  <section id="hero">
+    <div class="hero-bg-glow" aria-hidden="true">
+      <div class="glow-orb glow-1"></div>
+      <div class="glow-orb glow-2"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge reveal-fade">
+        <span class="badge-pulse"></span>
+        Centro Automotivo Premium · Porto Alegre
+      </div>
+      <h1 class="hero-title">
+        <span class="hero-line" data-delay="0">O cuidado que</span>
+        <span class="hero-line accent-gradient" data-delay="1">seu carro</span>
+        <span class="hero-line" data-delay="2">merece.</span>
+      </h1>
+      <p class="hero-sub reveal-fade" data-delay="3">
+        Chapeação · Pintura · Martelinho de Ouro · Vitrificação<br>
+        Qualidade premium. Prazo garantido. Resultado impecável.
+      </p>
+      <div class="hero-actions reveal-fade" data-delay="4">
+        <a href="#orcamento" class="btn btn-primary btn-lg">
+          Solicitar Orçamento
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#servicos" class="btn btn-ghost btn-lg">Ver Serviços</a>
+      </div>
+      <div class="hero-stats reveal-fade" data-delay="5">
+        <div class="hstat">
+          <strong>15+</strong>
+          <span>anos de experiência</span>
+        </div>
+        <div class="hstat-sep" aria-hidden="true"></div>
+        <div class="hstat">
+          <strong>2.000+</strong>
+          <span>veículos atendidos</span>
+        </div>
+        <div class="hstat-sep" aria-hidden="true"></div>
+        <div class="hstat">
+          <strong>98%</strong>
+          <span>clientes satisfeitos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero visual: animated car silhouette -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-car-wrap">
+        <svg class="hero-car-svg" viewBox="0 0 800 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Car body -->
+          <path d="M80 230 L120 230 L130 200 L180 160 L340 150 L450 155 L560 165 L640 195 L680 210 L700 230 L720 230" stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.15" class="car-outline"/>
+          <!-- Roof -->
+          <path d="M200 155 L240 110 L370 100 L470 108 L530 140 L560 155" stroke="#D83B21" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6" class="car-roof"/>
+          <!-- Windows -->
+          <path d="M245 112 L280 108 L285 140 L235 148Z" fill="#D83B21" opacity="0.15" class="car-window"/>
+          <path d="M295 106 L420 100 L425 140 L292 146Z" fill="#D83B21" opacity="0.15" class="car-window"/>
+          <path d="M432 102 L475 108 L468 140 L428 140Z" fill="#D83B21" opacity="0.12" class="car-window"/>
+          <!-- Wheels -->
+          <circle cx="200" cy="235" r="38" stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.2" class="car-wheel"/>
+          <circle cx="200" cy="235" r="22" stroke="#D83B21" stroke-width="1" fill="none" opacity="0.4"/>
+          <circle cx="590" cy="235" r="38" stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.2" class="car-wheel"/>
+          <circle cx="590" cy="235" r="22" stroke="#D83B21" stroke-width="1" fill="none" opacity="0.4"/>
+          <!-- Ground line -->
+          <line x1="60" y1="273" x2="740" y2="273" stroke="#D83B21" stroke-width="0.5" opacity="0.3" class="car-ground"/>
+          <!-- Shine -->
+          <path d="M300 120 L450 115" stroke="white" stroke-width="1" opacity="0.06" stroke-linecap="round"/>
+        </svg>
+        <!-- Glow under car -->
+        <div class="car-glow" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="hero-scroll-hint reveal-fade" data-delay="6">
+      <span>Rolar para descobrir</span>
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 3v12M4 11l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </section>
+
+  <!-- ===================== MARQUEE STRIP ===================== -->
+  <div class="marquee-strip" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Chapeação</span><span class="sep">·</span>
+      <span>Pintura Automotiva</span><span class="sep">·</span>
+      <span>Martelinho de Ouro</span><span class="sep">·</span>
+      <span>Espelhamento</span><span class="sep">·</span>
+      <span>Vitrificação</span><span class="sep">·</span>
+      <span>Higienização</span><span class="sep">·</span>
+      <span>Película Automotiva</span><span class="sep">·</span>
+      <span>Chapeação</span><span class="sep">·</span>
+      <span>Pintura Automotiva</span><span class="sep">·</span>
+      <span>Martelinho de Ouro</span><span class="sep">·</span>
+      <span>Espelhamento</span><span class="sep">·</span>
+      <span>Vitrificação</span><span class="sep">·</span>
+      <span>Higienização</span><span class="sep">·</span>
+      <span>Película Automotiva</span><span class="sep">·</span>
+    </div>
+  </div>
+
+  <!-- ===================== SERVICES ===================== -->
+  <section id="servicos" class="section-services">
+    <div class="container">
+      <div class="section-head">
+        <span class="tag reveal-up">Especialidades</span>
+        <h2 class="reveal-up" data-delay="1">Serviços que<br><em>transformam</em></h2>
+        <p class="reveal-up" data-delay="2">Do pequeno amassado ao reparo completo.<br>Cada trabalho entregue com excelência e garantia.</p>
+      </div>
+
+      <div class="services-grid">
+
+        <div class="service-card reveal-card" data-idx="0">
+          <div class="sc-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M4 22 L7 12 L10 16 L14 8 L18 14 L22 10 L25 16" stroke="#D83B21" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="2" y="22" width="24" height="2.5" rx="1.25" fill="#D83B21" opacity="0.25"/>
+            </svg>
+          </div>
+          <div class="sc-body">
+            <h3>Chapeação</h3>
+            <p>Restauração completa da lataria com técnicas profissionais e materiais de alta qualidade para resultados perfeitos.</p>
+          </div>
+          <span class="sc-badge">+ procurado</span>
+          <div class="sc-shine" aria-hidden="true"></div>
+        </div>
+
+        <div class="service-card reveal-card" data-idx="1">
+          <div class="sc-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <circle cx="14" cy="14" r="10" stroke="#D83B21" stroke-width="1.8"/>
+              <circle cx="14" cy="14" r="5" fill="#D83B21" opacity="0.2"/>
+              <path d="M14 4v3M14 21v3M4 14h3M21 14h3" stroke="#D83B21" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="sc-body">
+            <h3>Pintura Automotiva</h3>
+            <p>Cabine profissional com combinação de cores por computador e acabamento idêntico ao original de fábrica.</p>
+          </div>
+          <span class="sc-badge sc-badge--gold">Premium</span>
+          <div class="sc-shine" aria-hidden="true"></div>
+        </div>
+
+        <div class="service-card reveal-card" data-idx="2">
+          <div class="sc-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M8 14 C8 10 10.7 7.5 14 7.5 C17.3 7.5 20 10 20 14" stroke="#D83B21" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M11 18 L14 12 L17 18" stroke="#D83B21" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="14" cy="18" r="2" fill="#D83B21" opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="sc-body">
+            <h3>Martelinho de Ouro</h3>
+            <p>Técnica PDR que remove amassados sem repintura, preservando o acabamento e o valor do seu veículo.</p>
+          </div>
+          <span class="sc-badge">Sem repintura</span>
+          <div class="sc-shine" aria-hidden="true"></div>
+        </div>
+
+        <div class="service-card reveal-card" data-idx="3">
+          <div class="sc-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M5 14 C5 9 9 5 14 5 C19 5 23 9 23 14 C23 19 19 23 14 23" stroke="#D83B21" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M14 5 L16 9 L14 13 L12 9Z" fill="#D83B21" opacity="0.4"/>
+              <path d="M7 21 L10 18 L13 21" stroke="#D83B21" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="sc-body">
+            <h3>Espelhamento</h3>
+            <p>Polimento técnico multicamadas que elimina riscos finos e devolve o brilho espelhado original à pintura.</p>
+          </div>
+          <div class="sc-shine" aria-hidden="true"></div>
+        </div>
+
+        <div class="service-card reveal-card" data-idx="4">
+          <div class="sc-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="5" y="9" width="18" height="12" rx="2" stroke="#D83B21" stroke-width="1.8"/>
+              <path d="M9 9 V7 A5 5 0 0 1 19 7 V9" stroke="#D83B21" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="14" cy="15" r="2" fill="#D83B21" opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="sc-body">
+            <h3>Vitrificação</h3>
+            <p>Camada nanocerâmica que protege contra riscos, chuva ácida, UV e sujeira por anos com brilho permanente.</p>
+          </div>
+          <span class="sc-badge sc-badge--gold">Proteção total</span>
+          <div class="sc-shine" aria-hidden="true"></div>
+        </div>
+
+        <div class="service-card reveal-card" data-idx="5">
+          <div class="sc-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M3 26 L8 10 L12 16 L15 9 L19 15 L23 8 L26 14" stroke="#D83B21" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="2" y1="26" x2="26" y2="26" stroke="#D83B21" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+            </svg>
+          </div>
+          <div class="sc-body">
+            <h3>Higienização</h3>
+            <p>Limpeza profissional do interior com produtos sanitizantes que eliminam bactérias, fungos e odores.</p>
+          </div>
+          <div class="sc-shine" aria-hidden="true"></div>
+        </div>
+
+        <!-- Wide card -->
+        <div class="service-card service-card--wide reveal-card" data-idx="6">
+          <div class="sc-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="3" y="7" width="22" height="16" rx="2" stroke="#D83B21" stroke-width="1.8"/>
+              <path d="M9 7 V5 A2 2 0 0 1 13 5 V7 M15 7 V5 A2 2 0 0 1 19 5 V7" stroke="#D83B21" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M7 15 H21 M7 19 H17" stroke="#D83B21" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="sc-body">
+            <h3>Película Automotiva</h3>
+            <p>Películas de proteção solar e de segurança para vidros, aplicadas com precisão para longa durabilidade e conforto térmico.</p>
+          </div>
+          <a href="#orcamento" class="sc-link">
+            Solicitar orçamento
+            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <div class="sc-shine" aria-hidden="true"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STATS ===================== -->
+  <section class="section-stats">
+    <div class="container">
+      <div class="stats-row">
+        <div class="stat-item reveal-stat">
+          <div class="stat-num"><span class="count" data-target="15">0</span><em>+</em></div>
+          <p>Anos de experiência</p>
+        </div>
+        <div class="stat-item reveal-stat" data-delay="1">
+          <div class="stat-num"><span class="count" data-target="2000">0</span><em>+</em></div>
+          <p>Veículos restaurados</p>
+        </div>
+        <div class="stat-item reveal-stat" data-delay="2">
+          <div class="stat-num"><span class="count" data-target="98">0</span><em>%</em></div>
+          <p>Satisfação dos clientes</p>
+        </div>
+        <div class="stat-item reveal-stat" data-delay="3">
+          <div class="stat-num"><span class="count" data-target="2">0</span><em>h</em></div>
+          <p>Resposta garantida</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT ===================== -->
+  <section id="sobre" class="section-about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text">
+          <span class="tag reveal-up">Sobre Nós</span>
+          <h2 class="reveal-up" data-delay="1">Tradição e excelência<br><em>em cada detalhe</em></h2>
+          <p class="about-lead reveal-up" data-delay="2">Há mais de 15 anos, transformamos a forma como Porto Alegre cuida dos seus veículos.</p>
+          <p class="reveal-up" data-delay="3">Nossa equipe de especialistas utiliza os mais modernos equipamentos e técnicas da indústria automotiva, combinados com produtos de alta qualidade para garantir resultados impecáveis em cada trabalho entregue.</p>
+          <ul class="feature-list">
+            <li class="reveal-up" data-delay="4">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#D83B21" stroke-width="1.5"/><path d="M5.5 9l2.5 2.5 4.5-4.5" stroke="#D83B21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Equipe certificada e altamente treinada
+            </li>
+            <li class="reveal-up" data-delay="5">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#D83B21" stroke-width="1.5"/><path d="M5.5 9l2.5 2.5 4.5-4.5" stroke="#D83B21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Cabine de pintura com controle digital de temperatura
+            </li>
+            <li class="reveal-up" data-delay="6">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#D83B21" stroke-width="1.5"/><path d="M5.5 9l2.5 2.5 4.5-4.5" stroke="#D83B21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Prazo comprometido com garantia por escrito
+            </li>
+            <li class="reveal-up" data-delay="7">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#D83B21" stroke-width="1.5"/><path d="M5.5 9l2.5 2.5 4.5-4.5" stroke="#D83B21" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Orçamento transparente, sem surpresas no final
+            </li>
+          </ul>
+          <a href="#orcamento" class="btn btn-primary reveal-up" data-delay="8">Solicitar Orçamento</a>
+        </div>
+        <div class="about-visual reveal-right">
+          <div class="about-img-frame">
+            <!-- Replace with your actual workshop photo -->
+            <img src="assets/images/oficina.jpg" alt="Oficina Aliança Centro Automotivo" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('img-placeholder')">
+            <div class="img-fallback" aria-hidden="true">
+              <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                <rect width="80" height="80" rx="4" fill="#1c1c1e"/>
+                <path d="M10 55 L22 30 L32 42 L42 25 L55 38 L70 55Z" fill="#D83B21" opacity="0.2"/>
+                <circle cx="55" cy="22" r="8" fill="#D83B21" opacity="0.3"/>
+              </svg>
+              <p>Adicione a foto<br>da sua oficina</p>
+            </div>
+          </div>
+          <div class="about-float about-float--1 reveal-up" data-delay="4">
+            <strong>15+ anos</strong>
+            <span>no mercado</span>
+          </div>
+          <div class="about-float about-float--2 reveal-up" data-delay="5">
+            <strong>Porto Alegre</strong>
+            <span>Jardim Lindóia</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PROCESS ===================== -->
+  <section class="section-process">
+    <div class="container">
+      <div class="section-head section-head--center">
+        <span class="tag reveal-up">Como Funciona</span>
+        <h2 class="reveal-up" data-delay="1">Simples e<br><em>descomplicado</em></h2>
+      </div>
+      <div class="process-steps">
+        <div class="process-step reveal-up" data-delay="2">
+          <div class="step-num">01</div>
+          <div class="step-line" aria-hidden="true"></div>
+          <h3>Solicite o orçamento</h3>
+          <p>Preencha o formulário ou envie uma mensagem pelo WhatsApp. Respondemos em até 2 horas no horário comercial.</p>
+        </div>
+        <div class="process-arrow reveal-up" data-delay="3" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="process-step reveal-up" data-delay="4">
+          <div class="step-num">02</div>
+          <div class="step-line" aria-hidden="true"></div>
+          <h3>Avaliação presencial</h3>
+          <p>Nossa equipe avalia o veículo e apresenta um orçamento detalhado, sem letras miúdas e sem surpresas.</p>
+        </div>
+        <div class="process-arrow reveal-up" data-delay="5" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="process-step reveal-up" data-delay="6">
+          <div class="step-num">03</div>
+          <div class="step-line" aria-hidden="true"></div>
+          <h3>Serviço e entrega</h3>
+          <p>Executamos o serviço com excelência e entregamos seu carro no prazo combinado, com garantia.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TESTIMONIALS ===================== -->
+  <section id="depoimentos" class="section-testimonials">
+    <div class="container">
+      <div class="section-head">
+        <span class="tag reveal-up">Depoimentos</span>
+        <h2 class="reveal-up" data-delay="1">O que nossos<br><em>clientes dizem</em></h2>
+      </div>
+      <div class="testimonials-wrap">
+        <div class="testimonials-track" id="tTrack">
+
+          <article class="tcard">
+            <div class="tcard-stars">★★★★★</div>
+            <blockquote>"Levei meu carro após um acidente e o resultado foi incrível — parecia zero-km! O prazo foi cumprido à risca e o preço foi muito justo. Super recomendo para todos!"</blockquote>
+            <footer>
+              <div class="tcard-avatar">MR</div>
+              <div class="tcard-author">
+                <strong>Marcos Rodrigues</strong>
+                <span>Volkswagen Polo 2022</span>
+              </div>
+            </footer>
+          </article>
+
+          <article class="tcard">
+            <div class="tcard-stars">★★★★★</div>
+            <blockquote>"Fiz vitrificação no meu carro e o resultado superou todas as expectativas. Atendimento muito profissional, equipe que realmente entende do assunto. Voltarei com certeza!"</blockquote>
+            <footer>
+              <div class="tcard-avatar">AS</div>
+              <div class="tcard-author">
+                <strong>Ana Silva</strong>
+                <span>Toyota Corolla 2021</span>
+              </div>
+            </footer>
+          </article>
+
+          <article class="tcard">
+            <div class="tcard-stars">★★★★★</div>
+            <blockquote>"O martelinho de ouro foi incrível! Amassado feio no capô removido sem repintura, ficou perfeito. Rápido, preço honesto e equipe muito atenciosa. Parabéns!"</blockquote>
+            <footer>
+              <div class="tcard-avatar">CP</div>
+              <div class="tcard-author">
+                <strong>Carlos Pereira</strong>
+                <span>Chevrolet Onix 2023</span>
+              </div>
+            </footer>
+          </article>
+
+          <article class="tcard">
+            <div class="tcard-stars">★★★★★</div>
+            <blockquote>"Trabalho impecável, equipe comprometida com qualidade. Segunda vez que trago meu carro aqui e a experiência só melhora. Recomendo para amigos e família!"</blockquote>
+            <footer>
+              <div class="tcard-avatar">FL</div>
+              <div class="tcard-author">
+                <strong>Fernanda Lima</strong>
+                <span>Hyundai HB20 2020</span>
+              </div>
+            </footer>
+          </article>
+
+        </div>
+      </div>
+      <div class="t-controls">
+        <button class="t-btn t-prev" aria-label="Depoimento anterior">
+          <svg width="20" height="20" viewBox="0 0 20 20"><path d="M13 16l-6-6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="t-dots" role="tablist"></div>
+        <button class="t-btn t-next" aria-label="Próximo depoimento">
+          <svg width="20" height="20" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LEAD CAPTURE ===================== -->
+  <section id="orcamento" class="section-lead">
+    <div class="container">
+      <div class="lead-grid">
+
+        <div class="lead-info">
+          <span class="tag reveal-up">Orçamento Grátis</span>
+          <h2 class="reveal-up" data-delay="1">Seu carro merece<br><em>o melhor cuidado</em></h2>
+          <p class="reveal-up" data-delay="2">Preencha o formulário e nossa equipe retornará em até <strong>2 horas</strong> no horário comercial.</p>
+
+          <ul class="contact-list">
+            <li class="reveal-up" data-delay="3">
+              <div class="clist-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2.5 4.5A1.5 1.5 0 014 3h10a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0114 15H4a1.5 1.5 0 01-1.5-1.5v-9z" stroke="#D83B21" stroke-width="1.5"/><path d="M2.5 4.5L9 10l6.5-5.5" stroke="#D83B21" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <strong>E-mail</strong>
+                <a href="mailto:comercial@centroautoalianca.com.br">comercial@centroautoalianca.com.br</a>
+              </div>
+            </li>
+            <li class="reveal-up" data-delay="4">
+              <div class="clist-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5A2 2 0 015 3h.5a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H5a.5.5 0 00-.5.5V7A7 7 0 0011 13.5h.5a.5.5 0 00.5-.5v-.5a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v.5A2 2 0 0113 15C7 15 3 11 3 5z" stroke="#D83B21" stroke-width="1.5"/></svg>
+              </div>
+              <div>
+                <strong>WhatsApp</strong>
+                <a href="https://wa.me/5551994687074">(51) 9 9468-7074</a>
+              </div>
+            </li>
+            <li class="reveal-up" data-delay="5">
+              <div class="clist-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5 5 0 00-5 5c0 3.5 5 9 5 9s5-5.5 5-9a5 5 0 00-5-5z" stroke="#D83B21" stroke-width="1.5"/><circle cx="9" cy="7" r="2" stroke="#D83B21" stroke-width="1.5"/></svg>
+              </div>
+              <div>
+                <strong>Endereço</strong>
+                <span>Rua Aliança, 70 — Jardim Lindóia, Porto Alegre RS</span>
+              </div>
+            </li>
+            <li class="reveal-up" data-delay="6">
+              <div class="clist-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="#D83B21" stroke-width="1.5"/><path d="M9 5v4l2.5 2.5" stroke="#D83B21" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <strong>Horário</strong>
+                <span>Segunda a Sexta: 8h–13h e 13:30–18:20</span>
+              </div>
+            </li>
+          </ul>
+
+          <!-- WhatsApp CTA -->
+          <a href="https://wa.me/5551994687074?text=Olá!%20Gostaria%20de%20solicitar%20um%20orçamento." class="btn-whatsapp reveal-up" data-delay="7" target="_blank" rel="noopener">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2C6.03 2 2 6.03 2 11c0 1.7.46 3.3 1.26 4.67L2 20l4.48-1.21A9 9 0 1011 2z" fill="#25D366"/><path d="M7.5 7.5c0 0-.4-.4-1 0C5.9 8.1 5.5 8.8 5.5 9.2c0 2 1.8 4.2 4.2 5.5 0 0 .4.3 1.1.3s1.4-.3 1.5-1c0-.4-.4-.8-.8-1.1l-.8-.5s-.4-.3-.8 0l-.4.4s-.8-.7-1.5-1.5l.4-.4c.3-.4 0-.8 0-.8L7.5 9.5s-.4-.4-.5-.6c-.1-.3 0-.5.5-.9z" fill="white"/></svg>
+            Falar pelo WhatsApp
+          </a>
+        </div>
+
+        <div class="lead-form-wrap reveal-right">
+          <form id="leadForm" novalidate>
+            <div class="form-field">
+              <label for="f-nome">Nome completo <span aria-hidden="true">*</span></label>
+              <input type="text" id="f-nome" name="nome" required autocomplete="name" placeholder="Seu nome completo">
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="f-wpp">WhatsApp <span aria-hidden="true">*</span></label>
+                <input type="tel" id="f-wpp" name="whatsapp" required autocomplete="tel" placeholder="(51) 9 9999-9999">
+              </div>
+              <div class="form-field">
+                <label for="f-email">E-mail</label>
+                <input type="email" id="f-email" name="email" autocomplete="email" placeholder="seu@email.com">
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="f-servico">Serviço desejado <span aria-hidden="true">*</span></label>
+              <div class="select-wrap">
+                <select id="f-servico" name="servico" required>
+                  <option value="">Selecione o serviço</option>
+                  <option value="chapeacao">Chapeação</option>
+                  <option value="pintura">Pintura Automotiva</option>
+                  <option value="martelinho">Martelinho de Ouro</option>
+                  <option value="espelhamento">Espelhamento</option>
+                  <option value="vitrificacao">Vitrificação</option>
+                  <option value="higienizacao">Higienização</option>
+                  <option value="pelicula">Película Automotiva</option>
+                  <option value="outro">Outro</option>
+                </select>
+                <svg class="select-arrow" width="14" height="14" viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="f-msg">Descreva o problema (opcional)</label>
+              <textarea id="f-msg" name="mensagem" rows="4" placeholder="Conte o que aconteceu com seu veículo..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="formBtn">
+              <span class="btn-label">Solicitar Orçamento Grátis</span>
+              <span class="btn-loading" aria-hidden="true">Enviando…</span>
+              <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <p class="form-note">* Resposta em até 2h no horário comercial. Seus dados são protegidos.</p>
+          </form>
+
+          <div id="formSuccess" class="form-success" hidden>
+            <div class="success-check">
+              <svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#D83B21" opacity="0.1"/><path d="M9 16l5 5 9-9" stroke="#D83B21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>Orçamento solicitado!</h3>
+            <p>Entraremos em contato pelo WhatsApp em até 2 horas. Obrigado!</p>
+            <a href="https://wa.me/5551994687074" class="btn btn-primary" target="_blank">Acompanhar pelo WhatsApp</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BLOG ===================== -->
+  <section id="blog" class="section-blog">
+    <div class="container">
+      <div class="blog-head">
+        <div>
+          <span class="tag reveal-up">Blog</span>
+          <h2 class="reveal-up" data-delay="1">Dicas e novidades<br><em>automotivas</em></h2>
+        </div>
+        <a href="/blog" class="btn btn-ghost reveal-up" data-delay="2">Ver todos →</a>
+      </div>
+      <div class="blog-grid" id="blogGrid">
+        <!-- Skeleton loaders -->
+        <div class="blog-card blog-skeleton"><div class="bs-img"></div><div class="bs-body"><div class="bs-tag"></div><div class="bs-title"></div><div class="bs-line"></div><div class="bs-line short"></div></div></div>
+        <div class="blog-card blog-skeleton"><div class="bs-img"></div><div class="bs-body"><div class="bs-tag"></div><div class="bs-title"></div><div class="bs-line"></div><div class="bs-line short"></div></div></div>
+        <div class="blog-card blog-skeleton"><div class="bs-img"></div><div class="bs-body"><div class="bs-tag"></div><div class="bs-title"></div><div class="bs-line"></div><div class="bs-line short"></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer id="contato" class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="nav-logo footer-logo" aria-label="Aliança">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="12" stroke="#D83B21" stroke-width="1.5"/><text x="14" y="18" text-anchor="middle" fill="#f5f5f7" font-size="6.5" font-family="Inter" font-weight="700">ACA</text></svg>
+            <span>Aliança<em>.</em></span>
+          </a>
+          <p>Centro Automotivo especializado em chapeação, pintura e proteção automotiva em Porto Alegre, RS.</p>
+          <div class="social-row">
+            <a href="https://instagram.com/centroautoalianca" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="4" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="13" cy="5" r="1" fill="currentColor"/></svg>
+            </a>
+            <a href="https://wa.me/5551994687074" target="_blank" rel="noopener" aria-label="WhatsApp">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5A7.5 7.5 0 001.5 9c0 1.4.38 2.7 1.04 3.84L1.5 16.5l3.77-1.01A7.5 7.5 0 109 1.5z" stroke="currentColor" stroke-width="1.5"/></svg>
+            </a>
+            <a href="https://maps.google.com/?q=Rua+Aliança+70+Porto+Alegre" target="_blank" rel="noopener" aria-label="Google Maps">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5.5 5.5 0 00-5.5 5.5C3.5 11.5 9 16 9 16s5.5-4.5 5.5-8.5A5.5 5.5 0 009 2z" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="7.5" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Serviços</h4>
+          <ul>
+            <li><a href="#servicos">Chapeação</a></li>
+            <li><a href="#servicos">Pintura Automotiva</a></li>
+            <li><a href="#servicos">Martelinho de Ouro</a></li>
+            <li><a href="#servicos">Espelhamento</a></li>
+            <li><a href="#servicos">Vitrificação</a></li>
+            <li><a href="#servicos">Higienização</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Empresa</h4>
+          <ul>
+            <li><a href="#sobre">Sobre nós</a></li>
+            <li><a href="#depoimentos">Depoimentos</a></li>
+            <li><a href="#orcamento">Orçamento</a></li>
+            <li><a href="/blog">Blog</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col footer-contact">
+          <h4>Contato</h4>
+          <address>
+            <p>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5A4 4 0 003 5.5C3 8.5 7 13 7 13s4-4.5 4-7.5A4 4 0 007 1.5z" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+              Rua Aliança, 70 — Jardim Lindóia<br>Porto Alegre — RS
+            </p>
+            <p>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4A1.5 1.5 0 013.5 2.5H4a.5.5 0 01.5.5v1.5a.5.5 0 01-.5.5h-.5A.5.5 0 003 5.5V6A5.5 5.5 0 008 11.5h.5a.5.5 0 00.5-.5v-.5a.5.5 0 01.5-.5H11a.5.5 0 01.5.5V11A1.5 1.5 0 0110 12.5C5.5 12.5 2 9 2 4.5V4z" stroke="currentColor" stroke-width="1.3"/></svg>
+              <a href="tel:+5551994687074">(51) 9 9468-7074</a>
+            </p>
+            <p>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3" width="11" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 3.5L7 8l5.5-4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <a href="mailto:comercial@centroautoalianca.com.br">comercial@<wbr>centroautoalianca.com.br</a>
+            </p>
+            <p>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Seg–Sex: 8h–13h / 13:30–18:20
+            </p>
+          </address>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; <span id="ftYear">2025</span> Aliança Centro Automotivo. Todos os direitos reservados.</p>
+        <p>Desenvolvido com <span aria-label="amor">♥</span> em Porto Alegre</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================== WHATSAPP FLOAT ===================== -->
+  <a href="https://wa.me/5551994687074?text=Olá!%20Vim%20pelo%20site%20e%20gostaria%20de%20solicitar%20um%20orçamento."
+     class="wpp-float" target="_blank" rel="noopener" aria-label="Falar pelo WhatsApp">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <path d="M13 2C7 2 2 7 2 13c0 1.95.53 3.78 1.45 5.35L2 24l5.82-1.42A10.93 10.93 0 0013 24C19 24 24 19 24 13S19 2 13 2z" fill="white"/>
+      <path d="M9 9.5c0 0-.5-.5-1.1 0C7.3 10.1 7 10.8 7 11.2c0 2.2 2 4.8 4.8 6.3 0 0 .5.3 1.2.3s1.6-.4 1.7-1.1c0-.4-.4-.9-.9-1.2l-.9-.6s-.5-.3-.9 0l-.4.4s-.9-.8-1.7-1.7l.4-.4c.4-.4 0-.9 0-.9L9 10.7S8.5 10.2 9 9.5z" fill="#25D366"/>
+    </svg>
+    <span class="wpp-tooltip">Falar pelo WhatsApp</span>
+  </a>
+
+  <!-- Back to top -->
+  <button class="back-top" id="backTop" aria-label="Voltar ao topo">
+    <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 14V4M4 8l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <script src="assets/js/main.js"></script>
+</body>
 </html>

@@ -1,0 +1,15 @@
+# Config com chaves sensíveis — NUNCA commitar
+config.php
+.env
+.env.local
+
+# Leads coletados — dados privados
+data/leads.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

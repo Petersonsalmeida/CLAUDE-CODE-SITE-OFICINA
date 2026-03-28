@@ -1,381 +1,222 @@
 <?php
-require_once __DIR__ . '/../config.php';
+// Individual blog post page
+$slug = preg_replace('/[^a-z0-9_-]/', '', strtolower($_GET['slug'] ?? ''));
+if (!$slug) { header('Location: /blog'); exit; }
 
-$slug = preg_replace('/[^a-z0-9-]/', '', strtolower($_GET['slug'] ?? ''));
-if (empty($slug)) {
-    header('Location: /blog');
-    exit;
-}
-
-$file = POSTS_DIR . $slug . '.json';
+$file = __DIR__ . '/../data/posts/' . $slug . '.json';
 if (!file_exists($file)) {
     http_response_code(404);
     $post = null;
 } else {
     $post = json_decode(file_get_contents($file), true);
-    if (!$post || ($post['status'] ?? '') !== 'published') {
+    if (!$post || !($post['published'] ?? true)) {
         http_response_code(404);
         $post = null;
     }
 }
 
-// Posts relacionados
+// Get related posts
 $related = [];
-if ($post) {
-    $all = glob(POSTS_DIR . '*.json') ?: [];
-    foreach ($all as $f) {
+if ($post && is_dir(__DIR__ . '/../data/posts/')) {
+    foreach (glob(__DIR__ . '/../data/posts/*.json') as $f) {
         if (basename($f) === $slug . '.json') continue;
-        $p = json_decode(file_get_contents($f), true);
-        if ($p && ($p['status'] ?? '') === 'published' && ($p['category'] ?? '') === ($post['category'] ?? '')) {
-            $related[] = $p;
-            if (count($related) >= 3) break;
+        $d = json_decode(file_get_contents($f), true);
+        if ($d && ($d['published'] ?? true) && ($d['category'] ?? '') === ($post['category'] ?? '')) {
+            $related[] = $d;
         }
     }
+    $related = array_slice($related, 0, 3);
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php if ($post): ?>
   <title><?= htmlspecialchars($post['title']) ?> — Aliança Centro Automotivo</title>
-  <meta name="description" content="<?= htmlspecialchars($post['excerpt'] ?? '') ?>" />
-  <link rel="canonical" href="<?= SITE_URL ?>/blog/<?= htmlspecialchars($slug) ?>" />
-  <meta property="og:type"        content="article" />
-  <meta property="og:title"       content="<?= htmlspecialchars($post['title']) ?>" />
-  <meta property="og:description" content="<?= htmlspecialchars($post['excerpt'] ?? '') ?>" />
-  <?php if (!empty($post['image_url'])): ?>
-  <meta property="og:image" content="<?= htmlspecialchars($post['image_url']) ?>" />
+  <meta name="description" content="<?= htmlspecialchars($post['excerpt'] ?? '') ?>">
+  <meta property="og:title" content="<?= htmlspecialchars($post['title']) ?>">
+  <meta property="og:description" content="<?= htmlspecialchars($post['excerpt'] ?? '') ?>">
+  <?php if (!empty($post['image'])): ?>
+  <meta property="og:image" content="<?= htmlspecialchars($post['image']) ?>">
   <?php endif; ?>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": "<?= addslashes($post['title']) ?>",
-    "datePublished": "<?= $post['published_at'] ?>",
-    "dateModified": "<?= $post['updated_at'] ?? $post['published_at'] ?>",
-    "author": { "@type": "Organization", "name": "<?= addslashes($post['author'] ?? COMPANY_NAME) ?>" },
-    "publisher": { "@type": "Organization", "name": "<?= COMPANY_NAME ?>", "url": "<?= SITE_URL ?>" }
-  }
-  </script>
+  <link rel="canonical" href="https://centroautoalianca.com.br/blog/<?= htmlspecialchars($slug) ?>">
   <?php else: ?>
   <title>Post não encontrado — Aliança Centro Automotivo</title>
   <?php endif; ?>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
   <style>
-    .post-hero {
-      background: var(--black);
-      padding: 130px 0 60px;
-      border-bottom: 1px solid rgba(219,13,21,0.2);
-    }
-    .post-breadcrumb {
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.4);
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .post-breadcrumb a { color: rgba(255,255,255,0.4); transition: var(--transition); }
-    .post-breadcrumb a:hover { color: var(--red); }
-    .post-breadcrumb i { font-size: 0.6rem; }
-    .post-hero h1 {
-      font-size: clamp(1.75rem, 4vw, 3rem);
-      font-weight: 800;
-      color: var(--white);
-      line-height: 1.2;
-      margin-bottom: 20px;
-      max-width: 820px;
-    }
-    .post-meta {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .post-meta-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.5); }
-    .post-meta-item i { color: var(--red); font-size: 0.8rem; }
-    .post-layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 56px;
-      padding: 64px 0 80px;
-    }
-    .post-cover {
-      width: 100%;
-      max-height: 480px;
-      object-fit: cover;
-      border-radius: var(--radius-lg);
-      margin-bottom: 40px;
-    }
-    .post-body {
-      font-size: 1rem;
-      line-height: 1.85;
-      color: #374151;
-    }
-    .post-body h2 { font-size: 1.5rem; font-weight: 700; color: var(--black); margin: 36px 0 16px; }
-    .post-body h3 { font-size: 1.2rem; font-weight: 600; color: var(--black); margin: 28px 0 12px; }
-    .post-body p  { margin-bottom: 18px; }
-    .post-body ul, .post-body ol { margin: 0 0 18px 24px; }
-    .post-body li { margin-bottom: 8px; }
-    .post-body strong { color: var(--black); }
-    .post-body a { color: var(--red); }
-    .post-body blockquote {
-      border-left: 4px solid var(--red);
-      padding: 16px 24px;
-      margin: 24px 0;
-      background: var(--light);
-      border-radius: 0 var(--radius) var(--radius) 0;
-      font-style: italic;
-      color: var(--gray);
-    }
-    .post-body img { border-radius: var(--radius); margin: 24px 0; }
-    .post-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 40px; padding-top: 32px; border-top: 1px solid #e5e7eb; }
-    .post-tag {
-      font-size: 0.78rem;
-      font-weight: 600;
-      background: var(--light);
-      color: var(--gray);
-      padding: 5px 12px;
-      border-radius: 100px;
-    }
-    .post-share {
-      margin-top: 32px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .post-share span { font-size: 0.85rem; font-weight: 600; color: var(--gray); }
-    .share-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 18px;
-      border-radius: var(--radius);
-      font-size: 0.8rem;
-      font-weight: 600;
-      transition: var(--transition);
-      color: var(--white);
-    }
-    .share-btn.whatsapp { background: #25D366; }
-    .share-btn.whatsapp:hover { background: #1ebe5d; }
-    /* Sidebar */
-    .post-sidebar { position: sticky; top: 100px; height: fit-content; }
-    .sidebar-card {
-      background: var(--light);
-      border-radius: var(--radius-lg);
-      padding: 28px;
-      margin-bottom: 24px;
-    }
-    .sidebar-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--black); margin-bottom: 20px; border-bottom: 2px solid var(--red); padding-bottom: 12px; }
-    .sidebar-related a {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-      align-items: flex-start;
-    }
-    .sidebar-related a:last-child { margin-bottom: 0; }
-    .sidebar-related-img {
-      width: 70px; height: 55px;
-      object-fit: cover;
-      border-radius: var(--radius);
-      flex-shrink: 0;
-    }
-    .sidebar-related-placeholder {
-      width: 70px; height: 55px;
-      background: var(--dark-3);
-      border-radius: var(--radius);
-      flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .sidebar-related-title { font-size: 0.82rem; font-weight: 600; color: var(--black); line-height: 1.4; }
-    .sidebar-related-date  { font-size: 0.72rem; color: var(--gray); margin-top: 4px; }
-    .sidebar-cta { background: var(--red); border-radius: var(--radius-lg); padding: 28px; text-align: center; }
-    .sidebar-cta h4 { color: var(--white); font-size: 1rem; margin-bottom: 10px; border: none; }
-    .sidebar-cta p  { color: rgba(255,255,255,0.8); font-size: 0.82rem; margin-bottom: 20px; }
-    /* 404 */
-    .post-404 { text-align: center; padding: 100px 0; }
-    .post-404 i { font-size: 4rem; color: #d1d5db; margin-bottom: 24px; }
-    .post-404 h2 { font-size: 1.5rem; color: var(--black); margin-bottom: 12px; }
-    .post-404 p  { color: var(--gray); margin-bottom: 32px; }
-    @media (max-width: 768px) {
-      .post-layout { grid-template-columns: 1fr; }
-      .post-sidebar { position: static; }
-    }
+    .post-hero { padding: calc(var(--nav-h) + 60px) 0 0; background: var(--bg-2); }
+    .post-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .post-cat { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--red); }
+    .post-date, .post-read { font-size: 13px; color: var(--text-3); }
+    .post-sep { color: var(--text-3); }
+    .post-title { font-size: clamp(32px, 5.5vw, 62px); font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin-bottom: 20px; max-width: 840px; }
+    .post-excerpt { font-size: 20px; color: var(--text-2); line-height: 1.6; max-width: 700px; margin-bottom: 48px; }
+    .post-cover { width: 100%; aspect-ratio: 21/9; object-fit: cover; border-radius: var(--radius-lg) var(--radius-lg) 0 0; max-height: 520px; }
+    .post-cover-placeholder { width: 100%; aspect-ratio: 21/9; max-height: 520px; background: var(--bg-elevated); border-radius: var(--radius-lg) var(--radius-lg) 0 0; display: flex; align-items: center; justify-content: center; }
+    .post-body { max-width: 740px; margin: 0 auto; padding: 64px 0 100px; }
+    .post-content { font-size: 17px; line-height: 1.78; color: var(--text-2); }
+    .post-content h2 { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; margin: 48px 0 16px; }
+    .post-content h3 { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; margin: 36px 0 12px; }
+    .post-content p { margin-bottom: 22px; }
+    .post-content strong { color: var(--text); font-weight: 600; }
+    .post-content em { color: var(--text); }
+    .post-content a { color: var(--red); text-decoration: underline; text-underline-offset: 3px; }
+    .post-content ul, .post-content ol { margin: 20px 0 24px 24px; display: flex; flex-direction: column; gap: 10px; }
+    .post-content ul { list-style: disc; }
+    .post-content ol { list-style: decimal; }
+    .post-content li { line-height: 1.6; }
+    .post-content blockquote { border-left: 3px solid var(--red); padding: 16px 24px; margin: 32px 0; background: var(--red-glow-s); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-style: italic; color: var(--text); }
+    .post-content img { width: 100%; border-radius: var(--radius); margin: 28px 0; }
+    .post-content code { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; font-size: 0.9em; color: var(--red); }
+    .post-content pre { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; overflow-x: auto; margin: 28px 0; }
+    .post-cta { background: var(--bg-card); border: 1px solid var(--border-s); border-radius: var(--radius-lg); padding: 40px; text-align: center; margin: 48px 0; }
+    .post-cta h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+    .post-cta p { color: var(--text-2); margin-bottom: 24px; }
+    .post-share { display: flex; align-items: center; gap: 12px; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border-s); flex-wrap: wrap; }
+    .post-share span { font-size: 13px; color: var(--text-3); font-weight: 600; }
+    .share-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: var(--radius-full); border: 1.5px solid var(--border); color: var(--text-2); font-size: 13px; font-weight: 600; transition: all 0.2s; }
+    .share-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-glow-s); }
+    .related-section { background: var(--bg-2); padding: 80px 0; border-top: 1px solid var(--border-s); }
+    .related-section h2 { font-size: 28px; font-weight: 700; margin-bottom: 32px; }
+    .not-found { text-align: center; padding: calc(var(--nav-h) + 100px) 24px 100px; }
+    .not-found h1 { font-size: 56px; font-weight: 900; color: var(--red); margin-bottom: 16px; }
+    .not-found p { color: var(--text-2); font-size: 18px; margin-bottom: 32px; }
   </style>
 </head>
 <body>
 
-<header id="header" class="scrolled">
-  <div class="container">
-    <div class="header-inner">
-      <a href="/" class="logo"><img src="/assets/images/logo-white.png" alt="Aliança Centro Automotivo" /></a>
-      <nav class="nav-menu">
-        <a href="/">Início</a>
-        <a href="/#servicos">Serviços</a>
-        <a href="/#sobre">Sobre</a>
-        <a href="/#orcamento">Orçamento</a>
-        <a href="/blog" class="active">Blog</a>
-        <a href="/#footer">Contato</a>
-      </nav>
-      <div class="nav-cta">
-        <a href="https://wa.me/<?= COMPANY_WHATSAPP ?>?text=Olá!" class="btn btn-primary" target="_blank" rel="noopener">
-          <i class="fa-brands fa-whatsapp"></i> WhatsApp
-        </a>
-      </div>
-      <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-    </div>
-  </div>
-</header>
-
-<?php if (!$post): ?>
-  <div class="container">
-    <div class="post-404" style="padding-top:160px">
-      <i class="fa-regular fa-file-circle-xmark"></i>
-      <h2>Post não encontrado</h2>
-      <p>O artigo que você está procurando não existe ou foi removido.</p>
-      <a href="/blog" class="btn btn-primary">
-        <i class="fa-solid fa-arrow-left"></i> Voltar para o Blog
+  <nav id="navbar" class="scrolled">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#D83B21" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" fill="#f5f5f7" font-size="7.5" font-family="Inter" font-weight="700">ACA</text></svg>
+        <span>Aliança<em>.</em></span>
       </a>
+      <ul class="nav-links">
+        <li><a href="/#servicos">Serviços</a></li>
+        <li><a href="/#sobre">Sobre</a></li>
+        <li><a href="/blog" style="color:var(--text)">Blog</a></li>
+        <li><a href="/#contato">Contato</a></li>
+      </ul>
+      <a href="/#orcamento" class="nav-cta">Orçamento Grátis</a>
+      <button class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
-  </div>
-<?php else: ?>
+  </nav>
 
-<div class="post-hero">
-  <div class="container">
-    <div class="post-breadcrumb">
-      <a href="/">Início</a>
-      <i class="fa-solid fa-chevron-right"></i>
-      <a href="/blog">Blog</a>
-      <i class="fa-solid fa-chevron-right"></i>
-      <span><?= htmlspecialchars($post['category'] ?? 'Geral') ?></span>
+  <?php if (!$post): ?>
+    <div class="not-found">
+      <h1>404</h1>
+      <p>Este post não foi encontrado ou foi removido.</p>
+      <a href="/blog" class="btn btn-primary">Ver todos os posts</a>
     </div>
-    <h1><?= htmlspecialchars($post['title']) ?></h1>
-    <div class="post-meta">
-      <?php if (!empty($post['published_at'])): ?>
-      <div class="post-meta-item">
-        <i class="fa-regular fa-calendar"></i>
-        <?= date('d \d\e F \d\e Y', strtotime($post['published_at'])) ?>
+  <?php else: ?>
+
+  <!-- POST HERO -->
+  <section class="post-hero">
+    <div class="container">
+      <div class="post-meta-row">
+        <a href="/blog?cat=<?= urlencode($post['category'] ?? '') ?>" class="post-cat"><?= htmlspecialchars($post['category'] ?? 'Dicas') ?></a>
+        <span class="post-sep">·</span>
+        <span class="post-date"><?= date('d \d\e F \d\e Y', strtotime($post['date'] ?? 'now')) ?></span>
+        <?php if (!empty($post['readTime'])): ?>
+        <span class="post-sep">·</span>
+        <span class="post-read"><?= htmlspecialchars($post['readTime']) ?></span>
+        <?php endif; ?>
       </div>
-      <?php endif; ?>
-      <?php if (!empty($post['author'])): ?>
-      <div class="post-meta-item">
-        <i class="fa-regular fa-user"></i>
-        <?= htmlspecialchars($post['author']) ?>
-      </div>
-      <?php endif; ?>
-      <?php if (!empty($post['category'])): ?>
-      <div class="post-meta-item">
-        <span class="blog-card-cat"><?= htmlspecialchars($post['category']) ?></span>
-      </div>
+      <h1 class="post-title"><?= htmlspecialchars($post['title']) ?></h1>
+      <?php if (!empty($post['excerpt'])): ?>
+      <p class="post-excerpt"><?= htmlspecialchars($post['excerpt']) ?></p>
       <?php endif; ?>
     </div>
-  </div>
-</div>
+    <?php if (!empty($post['image'])): ?>
+    <img class="post-cover" src="<?= htmlspecialchars($post['image']) ?>" alt="<?= htmlspecialchars($post['title']) ?>">
+    <?php else: ?>
+    <div class="post-cover-placeholder">
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none"><path d="M5 45 L18 22 L28 34 L38 18 L55 45Z" fill="#D83B21" opacity="0.2"/><circle cx="42" cy="16" r="6" fill="#D83B21" opacity="0.3"/></svg>
+    </div>
+    <?php endif; ?>
+  </section>
 
-<div class="container">
-  <div class="post-layout">
-    <main>
-      <?php if (!empty($post['image_url'])): ?>
-        <img class="post-cover" src="<?= htmlspecialchars($post['image_url']) ?>" alt="<?= htmlspecialchars($post['title']) ?>" />
-      <?php endif; ?>
+  <!-- POST CONTENT -->
+  <main>
+    <div class="container">
+      <article class="post-body">
+        <div class="post-content">
+          <?= $post['content'] ?? '<p>Conteúdo em breve.</p>' ?>
+        </div>
 
-      <div class="post-body">
-        <?= $post['content'] ?>
-      </div>
+        <!-- Inline CTA -->
+        <div class="post-cta">
+          <h3>Gostou do conteúdo?</h3>
+          <p>Solicite um orçamento gratuito e cuide do seu carro com quem entende.</p>
+          <a href="/#orcamento" class="btn btn-primary">Solicitar Orçamento Grátis</a>
+        </div>
 
-      <?php if (!empty($post['tags'])): ?>
-      <div class="post-tags">
-        <?php foreach ($post['tags'] as $tag): ?>
-          <span class="post-tag">#<?= htmlspecialchars($tag) ?></span>
-        <?php endforeach; ?>
-      </div>
-      <?php endif; ?>
-
-      <div class="post-share">
-        <span>Compartilhar:</span>
-        <a class="share-btn whatsapp"
-           href="https://wa.me/?text=<?= urlencode($post['title'] . ' - ' . SITE_URL . '/blog/' . $slug) ?>"
-           target="_blank" rel="noopener">
-          <i class="fa-brands fa-whatsapp"></i> WhatsApp
-        </a>
-      </div>
-    </main>
-
-    <aside class="post-sidebar">
-      <div class="sidebar-cta">
-        <h4>Precisa de um orçamento?</h4>
-        <p>Nossa equipe está pronta para te atender hoje mesmo.</p>
-        <a href="https://wa.me/<?= COMPANY_WHATSAPP ?>?text=Olá!%20Vi%20o%20blog%20e%20quero%20um%20orçamento."
-           class="btn btn-whatsapp" style="width:100%;justify-content:center" target="_blank" rel="noopener">
-          <i class="fa-brands fa-whatsapp"></i> Falar agora
-        </a>
-      </div>
-
-      <?php if (!empty($related)): ?>
-      <div class="sidebar-card">
-        <h4>Artigos relacionados</h4>
-        <div class="sidebar-related">
-          <?php foreach ($related as $r): ?>
-          <a href="/blog/<?= htmlspecialchars($r['slug']) ?>">
-            <?php if (!empty($r['image_url'])): ?>
-              <img class="sidebar-related-img" src="<?= htmlspecialchars($r['image_url']) ?>"
-                   alt="<?= htmlspecialchars($r['title']) ?>" loading="lazy" />
-            <?php else: ?>
-              <div class="sidebar-related-placeholder">
-                <i class="fa-regular fa-newspaper" style="font-size:1.2rem;color:var(--red);opacity:0.4"></i>
-              </div>
-            <?php endif; ?>
-            <div>
-              <div class="sidebar-related-title"><?= htmlspecialchars($r['title']) ?></div>
-              <div class="sidebar-related-date">
-                <?= !empty($r['published_at']) ? date('d/m/Y', strtotime($r['published_at'])) : '' ?>
-              </div>
-            </div>
+        <!-- Share -->
+        <div class="post-share">
+          <span>Compartilhar:</span>
+          <a class="share-btn" href="https://wa.me/?text=<?= urlencode($post['title'] . ' - https://centroautoalianca.com.br/blog/' . $slug) ?>" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5A6.5 6.5 0 001.5 8c0 1.2.33 2.33.9 3.3L1.5 14.5l3.27-.87A6.5 6.5 0 108 1.5z" stroke="currentColor" stroke-width="1.3"/></svg>
+            WhatsApp
           </a>
+          <button class="share-btn" onclick="navigator.clipboard.writeText(window.location.href).then(()=>alert('Link copiado!'))">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 11H4a2 2 0 01-2-2V4a2 2 0 012-2h5a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.3"/></svg>
+            Copiar link
+          </button>
+        </div>
+
+        <!-- Back to blog -->
+        <div style="margin-top: 40px;">
+          <a href="/blog" class="btn btn-ghost">← Voltar ao Blog</a>
+        </div>
+      </article>
+    </div>
+
+    <!-- Related posts -->
+    <?php if (!empty($related)): ?>
+    <section class="related-section">
+      <div class="container">
+        <h2>Posts relacionados</h2>
+        <div class="blog-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">
+          <?php foreach ($related as $r): ?>
+          <article class="blog-card">
+            <div class="blog-card-img-wrap">
+              <?php if (!empty($r['image'])): ?>
+                <img class="blog-card-img" src="<?= htmlspecialchars($r['image']) ?>" alt="<?= htmlspecialchars($r['title']) ?>" loading="lazy">
+              <?php else: ?>
+                <div style="aspect-ratio:16/9;background:var(--bg-elevated)"></div>
+              <?php endif; ?>
+            </div>
+            <div class="blog-card-body">
+              <p class="blog-card-cat"><?= htmlspecialchars($r['category'] ?? 'Dicas') ?></p>
+              <h3 class="blog-card-title"><a href="/blog/<?= htmlspecialchars($r['slug']) ?>"><?= htmlspecialchars($r['title']) ?></a></h3>
+              <p class="blog-card-excerpt"><?= htmlspecialchars($r['excerpt'] ?? '') ?></p>
+            </div>
+          </article>
           <?php endforeach; ?>
         </div>
       </div>
-      <?php endif; ?>
+    </section>
+    <?php endif; ?>
+  </main>
 
-      <div class="sidebar-card">
-        <h4>Contato</h4>
-        <div style="display:flex;flex-direction:column;gap:12px">
-          <div style="display:flex;gap:10px;align-items:center;font-size:0.85rem;color:var(--gray)">
-            <i class="fa-solid fa-phone" style="color:var(--red)"></i>
-            <a href="tel:<?= preg_replace('/\D/', '', COMPANY_PHONE) ?>" style="color:var(--gray)"><?= COMPANY_PHONE ?></a>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;font-size:0.85rem;color:var(--gray)">
-            <i class="fa-solid fa-location-dot" style="color:var(--red)"></i>
-            <span><?= COMPANY_ADDRESS ?></span>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;font-size:0.85rem;color:var(--gray)">
-            <i class="fa-regular fa-clock" style="color:var(--red)"></i>
-            <span>Seg–Sex: 08h–13h / 13h30–18h20</span>
-          </div>
-        </div>
-      </div>
-    </aside>
-  </div>
-</div>
+  <?php endif; ?>
 
-<?php endif; ?>
+  <footer style="padding:40px 0;border-top:1px solid var(--border-s);text-align:center">
+    <div class="container">
+      <p style="font-size:13px;color:var(--text-3)">&copy; <?= date('Y') ?> Aliança Centro Automotivo · <a href="/" style="color:var(--text-2)">Voltar ao site</a></p>
+    </div>
+  </footer>
 
-<a href="https://wa.me/<?= COMPANY_WHATSAPP ?>" class="whatsapp-float" target="_blank" rel="noopener">
-  <span class="whatsapp-float-label">Fale conosco!</span>
-  <div class="whatsapp-float-btn">
-    <div class="wa-pulse"></div>
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.847L.057 23.882l6.198-1.625A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 0 1-5.012-1.374l-.36-.213-3.68.965.981-3.591-.234-.369A9.818 9.818 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/>
-    </svg>
-  </div>
-</a>
+  <a href="https://wa.me/5551994687074" class="wpp-float" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 2C7 2 2 7 2 13c0 1.95.53 3.78 1.45 5.35L2 24l5.82-1.42A10.93 10.93 0 0013 24C19 24 24 19 24 13S19 2 13 2z" fill="white"/><path d="M9 9.5c0 0-.5-.5-1.1 0C7.3 10.1 7 10.8 7 11.2c0 2.2 2 4.8 4.8 6.3 0 0 .5.3 1.2.3s1.6-.4 1.7-1.1c0-.4-.4-.9-.9-1.2l-.9-.6s-.5-.3-.9 0l-.4.4s-.9-.8-1.7-1.7l.4-.4c.4-.4 0-.9 0-.9L9 10.7S8.5 10.2 9 9.5z" fill="#25D366"/></svg>
+  </a>
 
-<script src="/assets/js/main.js" defer></script>
+  <script src="/assets/js/main.js"></script>
 </body>
 </html>
