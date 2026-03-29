@@ -32,6 +32,10 @@ $category = htmlspecialchars($_GET['cat'] ?? '', ENT_QUOTES, 'UTF-8');
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog — Aliança Centro Automotivo</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+  <meta name="theme-color" content="#CC1A1A">
   <meta name="description" content="Dicas, novidades e curiosidades automotivas do blog da Aliança Centro Automotivo em Porto Alegre.">
   <link rel="canonical" href="https://centroautoalianca.com.br/blog">
   <link rel="preconnect" href="https://fonts.googleapis.com">
