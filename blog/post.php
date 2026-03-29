@@ -106,7 +106,10 @@ if ($post && is_dir(__DIR__ . '/../data/posts/')) {
   <nav id="navbar" class="scrolled">
     <div class="nav-inner">
       <a href="/" class="nav-logo" aria-label="Aliança Centro Automotivo">
-        <img src="/assets/images/logo-red.png" alt="Aliança Centro Automotivo" class="nav-logo-img" height="46">
+        <picture>
+          <source srcset="/assets/images/logo-05.webp" type="image/webp">
+          <img src="/assets/images/logo-05.png" alt="Aliança Centro Automotivo" class="nav-logo-img" width="120" height="46">
+        </picture>
       </a>
       <ul class="nav-links">
         <li><a href="/#servicos">Serviços</a></li>
