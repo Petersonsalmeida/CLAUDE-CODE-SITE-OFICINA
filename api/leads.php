@@ -57,8 +57,8 @@ if ($fh) {
 }
 
 // ---- Send notification email ----
-$toEmail   = defined('LEAD_EMAIL')    ? LEAD_EMAIL    : (defined('COMPANY_EMAIL') ? COMPANY_EMAIL : 'comercial@centroautoalianca.com.br');
-$fromEmail = defined('COMPANY_EMAIL') ? COMPANY_EMAIL : 'noreply@centroautoalianca.com.br';
+$toEmail   = defined('OWNER_EMAIL') ? OWNER_EMAIL : 'comercial@centroautoalianca.com.br';
+$fromEmail = defined('FROM_EMAIL') ? FROM_EMAIL : 'noreply@centroautoalianca.com.br';
 
 $subject = "Novo orçamento: {$nome} — {$servico}";
 $body = "Novo pedido de orçamento recebido:\n\n"
