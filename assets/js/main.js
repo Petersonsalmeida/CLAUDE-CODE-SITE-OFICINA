@@ -19,10 +19,10 @@ let lenis;
 (function initLenis() {
   if (typeof Lenis === 'undefined') return;
   lenis = new Lenis({
-    duration: 1.0,
+    duration: 0.75,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
-    wheelMultiplier: 0.8,
+    wheelMultiplier: 1.1,
     touchMultiplier: 1.5,
   });
   // Use ONLY GSAP ticker — no separate RAF loop to avoid double-call
@@ -227,14 +227,15 @@ let lenis;
   sections.forEach(({ el, bg }) => {
     const node = document.querySelector(el);
     if (!node) return;
+    // Usa CSS custom property em vez de animar backgroundColor no body (evita repaint)
     ScrollTrigger.create({
       trigger: node,
       start: 'top 60%',
       end: 'bottom 40%',
-      onEnter: () => gsap.to('body', { backgroundColor: bg, duration: 0.6, ease: 'power2.inOut' }),
-      onLeave: () => gsap.to('body', { backgroundColor: '#000', duration: 0.4 }),
-      onEnterBack: () => gsap.to('body', { backgroundColor: bg, duration: 0.6 }),
-      onLeaveBack: () => gsap.to('body', { backgroundColor: '#000', duration: 0.4 }),
+      onEnter:     () => node.style.setProperty('--section-bg', bg),
+      onLeave:     () => node.style.setProperty('--section-bg', '#000'),
+      onEnterBack: () => node.style.setProperty('--section-bg', bg),
+      onLeaveBack: () => node.style.setProperty('--section-bg', '#000'),
     });
   });
 

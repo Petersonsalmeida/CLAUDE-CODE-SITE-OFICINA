@@ -1418,6 +1418,13 @@ address { font-style: normal; }
   .hero-badge { font-size: 11px; text-align: center; }
 }
 
+/* ---- SCROLL PERFORMANCE ---------------------------------- */
+.section-services,.section-about,.section-process,
+.section-testimonials,.section-lead,.section-blog,.section-faq {
+  transform: translateZ(0);
+}
+.service-card, .tcard, .process-step { will-change: transform, opacity; }
+
 /* ---- FAQ -------------------------------------------------- */
 .section-faq { padding: 100px 0; background: var(--bg-2); }
 .section-faq .section-head p { color: var(--text-2); font-size: 16px; margin-top: 12px; }
