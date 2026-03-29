@@ -76,7 +76,7 @@ $category = htmlspecialchars($_GET['cat'] ?? '', ENT_QUOTES, 'UTF-8');
       <a href="/" class="nav-logo" aria-label="Aliança Centro Automotivo">
         <picture>
           <source srcset="/assets/images/logo-05.webp" type="image/webp">
-          <img src="/assets/images/logo-05.png" alt="Aliança Centro Automotivo" class="nav-logo-img" width="120" height="46">
+          <img src="/assets/images/logo-05.png" alt="Aliança Centro Automotivo" class="nav-logo-img" width="220" height="56">
         </picture>
       </a>
       <ul class="nav-links">

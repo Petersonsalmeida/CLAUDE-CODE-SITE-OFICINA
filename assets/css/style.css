@@ -149,9 +149,9 @@ address { font-style: normal; }
 }
 .nav-logo em { color: var(--red); font-style: normal; }
 .nav-logo-img {
-  height: 46px;
+  height: 56px;
   width: auto;
-  max-width: 160px;
+  max-width: 220px;
   display: block;
   object-fit: contain;
   filter: drop-shadow(0 0 8px rgba(204,26,26,0.2));
