@@ -1418,6 +1418,69 @@ address { font-style: normal; }
   .hero-badge { font-size: 11px; text-align: center; }
 }
 
+/* ---- FAQ -------------------------------------------------- */
+.section-faq { padding: 100px 0; background: var(--bg-2); }
+.section-faq .section-head p { color: var(--text-2); font-size: 16px; margin-top: 12px; }
+.section-faq .section-head p a { color: var(--red); text-decoration: none; }
+.section-faq .section-head p a:hover { text-decoration: underline; }
+
+.faq-list { max-width: 800px; margin: 56px auto 0; display: flex; flex-direction: column; gap: 12px; }
+
+.faq-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.25s;
+}
+.faq-item:hover { border-color: rgba(204,26,26,0.25); }
+.faq-item[open] { border-color: rgba(204,26,26,0.35); }
+
+.faq-item summary {
+  list-style: none;
+  padding: 22px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  color: var(--text);
+  transition: color 0.2s;
+  user-select: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+';
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--red);
+  flex-shrink: 0;
+  line-height: 1;
+  transition: transform 0.3s var(--ease-out-expo);
+}
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item summary:hover { color: var(--red); }
+
+.faq-answer {
+  padding: 0 24px 22px;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.7;
+  animation: faqIn 0.3s var(--ease-out-expo);
+}
+.faq-answer strong { color: var(--text); }
+
+@keyframes faqIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Map embed */
+.lead-map { margin-bottom: 20px; }
+.lead-map iframe { filter: grayscale(0.6) invert(0.9) hue-rotate(180deg); }
+
 /* ---- UTILITY --------------------------------------------- */
 .sr-only {
   position: absolute; width: 1px; height: 1px;

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /data/
+Disallow: /config.php
+Disallow: /config.example.php
+
+Sitemap: https://centroautoalianca.com.br/sitemap.xml

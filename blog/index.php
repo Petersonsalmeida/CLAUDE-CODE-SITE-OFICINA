@@ -37,6 +37,14 @@ $category = htmlspecialchars($_GET['cat'] ?? '', ENT_QUOTES, 'UTF-8');
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Google Analytics GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-S9CEX8HTG3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-S9CEX8HTG3');
+  </script>
   <link rel="stylesheet" href="/assets/css/style.css">
   <style>
     .blog-page-hero { padding: calc(var(--nav-h) + 80px) 0 64px; text-align: center; background: var(--bg-2); border-bottom: 1px solid var(--border-s); }

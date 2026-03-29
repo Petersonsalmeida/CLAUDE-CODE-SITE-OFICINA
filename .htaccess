@@ -2,6 +2,9 @@ Options -Indexes
 RewriteEngine On
 RewriteBase /
 
+# ---- Sitemap dinâmico ----
+RewriteRule ^sitemap\.xml$  /sitemap.php  [L]
+
 # ---- Blog URLs amigáveis ----
 RewriteRule ^blog/([a-z0-9_-]+)/?$  /blog/post.php?slug=$1  [L,QSA]
 
