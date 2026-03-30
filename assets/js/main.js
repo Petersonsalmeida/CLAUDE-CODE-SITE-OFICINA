@@ -1,7 +1,7 @@
 /* ============================================================
    ALIANÇA CENTRO AUTOMOTIVO — Main JavaScript
    GSAP ScrollTrigger · Lenis Smooth Scroll · Interactivity
-   v2 — Performance: ScrollTrigger.batch, quickTo, scrub 1.5
+   v3 — Performance: IntersectionObserver for reveals, ST ~9 instances
    ============================================================ */
 
 'use strict';
@@ -32,12 +32,100 @@ let lenis;
   } else {
     (function raf(time) { lenis.raf(time); requestAnimationFrame(raf); })(0);
   }
+  /* Apenas atualiza ST quando há scroll — ST agora tem ~9 instâncias */
   if (typeof ScrollTrigger !== 'undefined') {
     lenis.on('scroll', ScrollTrigger.update);
   }
 })();
 
-/* ---- GSAP SETUP ------------------------------------------ */
+/* ---- SCROLL REVEALS: IntersectionObserver nativo ----------
+   Substitui ScrollTrigger.batch() para todas as classes de reveal.
+   Zero custo por frame — só dispara quando o elemento entra na viewport.
+   Reduz ST de 73 → ~9 instâncias.
+   ---------------------------------------------------------- */
+(function initRevealObserver() {
+  /* Mapeamento de classe → animação CSS */
+  const revealMap = [
+    {
+      selector: '.reveal-up',
+      from: 'opacity:0;transform:translateY(36px)',
+      to:   'opacity:1;transform:translateY(0)',
+    },
+    {
+      selector: '.reveal-right',
+      from: 'opacity:0;transform:translateX(56px)',
+      to:   'opacity:1;transform:translateX(0)',
+    },
+    {
+      selector: '.reveal-card',
+      from: 'opacity:0;transform:translateY(48px)',
+      to:   'opacity:1;transform:translateY(0)',
+    },
+    {
+      selector: '.reveal-stat',
+      from: 'opacity:0;transform:translateY(24px)',
+      to:   'opacity:1;transform:translateY(0)',
+    },
+    {
+      selector: '.step-num',
+      from: 'opacity:0;transform:scale(0.5)',
+      to:   'opacity:1;transform:scale(1)',
+    },
+    {
+      selector: '.stat-num',
+      from: 'opacity:0;transform:scale(0.7)',
+      to:   'opacity:1;transform:scale(1)',
+    },
+  ];
+
+  /* Prepara todos os elementos (ocultos via inline style) */
+  revealMap.forEach(({ selector, from }) => {
+    document.querySelectorAll(selector).forEach((el, idx) => {
+      /* Aplica estado inicial */
+      from.split(';').forEach(rule => {
+        const [prop, val] = rule.split(':');
+        el.style[prop.trim().replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = val.trim();
+      });
+      el.style.transition = 'none'; /* sem transição até entrar na viewport */
+      el.dataset.revealIdx = idx;
+    });
+  });
+
+  /* Um único IntersectionObserver para cada grupo */
+  revealMap.forEach(({ selector, to }) => {
+    const els = document.querySelectorAll(selector);
+    if (!els.length) return;
+
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const idx = parseInt(el.dataset.revealIdx || 0, 10);
+        const delay = Math.min(idx * 70, 350); /* stagger máx 350ms */
+
+        /* Ativa transição no momento da entrada */
+        el.style.transition = `opacity 0.7s ease ${delay}ms, transform 0.7s cubic-bezier(0.22,1,0.36,1) ${delay}ms`;
+
+        /* Aplica estado final */
+        to.split(';').forEach(rule => {
+          const [prop, val] = rule.split(':');
+          el.style[prop.trim().replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = val.trim();
+        });
+
+        obs.unobserve(el); /* one-shot: remove após animar */
+      });
+    }, {
+      threshold: 0.05,
+      rootMargin: '0px 0px -60px 0px',
+    });
+
+    els.forEach(el => obs.observe(el));
+  });
+})();
+
+/* ---- GSAP: apenas hero + parallax + nav + section bgs ----
+   ST agora tem ~9 instâncias no total (era 73).
+   ---------------------------------------------------------- */
 (function initGSAP() {
   if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
   gsap.registerPlugin(ScrollTrigger);
@@ -56,65 +144,7 @@ let lenis;
     gsap.to(el, { opacity:1, y:0, duration:0.55, ease:'power2.out', delay:2.3 + i * 0.15 });
   });
 
-  /* ---- Scroll reveals: ScrollTrigger.batch ---- */
-  /* ANTES: 1 ScrollTrigger por elemento (~73 instâncias)            */
-  /* AGORA: 1 instância por grupo — reduz 73 → ~12 instâncias        */
-
-  ScrollTrigger.batch('.reveal-up', {
-    start: 'top 90%',
-    once: true,
-    onEnter: batch => gsap.fromTo(batch,
-      { opacity:0, y:36 },
-      { opacity:1, y:0, duration:0.75, ease:'power3.out', stagger:0.07, overwrite:true }
-    ),
-  });
-
-  ScrollTrigger.batch('.reveal-right', {
-    start: 'top 85%',
-    once: true,
-    onEnter: batch => gsap.fromTo(batch,
-      { opacity:0, x:56 },
-      { opacity:1, x:0, duration:0.9, ease:'power3.out', stagger:0.08, overwrite:true }
-    ),
-  });
-
-  ScrollTrigger.batch('.reveal-card', {
-    start: 'top 92%',
-    once: true,
-    onEnter: batch => gsap.fromTo(batch,
-      { opacity:0, y:48 },
-      { opacity:1, y:0, duration:0.65, ease:'power3.out', stagger:0.08, overwrite:true }
-    ),
-  });
-
-  ScrollTrigger.batch('.reveal-stat', {
-    start: 'top 88%',
-    once: true,
-    onEnter: batch => gsap.fromTo(batch,
-      { opacity:0, y:24 },
-      { opacity:1, y:0, duration:0.6, ease:'power3.out', stagger:0.1, overwrite:true }
-    ),
-  });
-
-  ScrollTrigger.batch('.step-num', {
-    start: 'top 80%',
-    once: true,
-    onEnter: batch => gsap.fromTo(batch,
-      { opacity:0, scale:0.5 },
-      { opacity:1, scale:1, duration:0.6, ease:'back.out(1.5)', stagger:0.15, overwrite:true }
-    ),
-  });
-
-  ScrollTrigger.batch('.stat-num', {
-    start: 'top 88%',
-    once: true,
-    onEnter: batch => gsap.fromTo(batch,
-      { scale:0.7, opacity:0 },
-      { scale:1, opacity:1, duration:0.6, ease:'back.out(1.7)', stagger:0.1, overwrite:true }
-    ),
-  });
-
-  /* ---- Parallax about: scrub suavizado (1.5s) ---- */
+  /* ---- Parallax about: scrub suavizado (1 instância ST) ---- */
   const aboutImg = document.querySelector('.about-img-frame');
   if (aboutImg) {
     gsap.fromTo(aboutImg,
@@ -128,14 +158,14 @@ let lenis;
     );
   }
 
-  /* ---- Nav scrolled state ---- */
+  /* ---- Nav scrolled state (1 instância ST) ---- */
   ScrollTrigger.create({
     start: 60,
-    onEnter: () => document.getElementById('navbar')?.classList.add('scrolled'),
+    onEnter:     () => document.getElementById('navbar')?.classList.add('scrolled'),
     onLeaveBack: () => document.getElementById('navbar')?.classList.remove('scrolled'),
   });
 
-  /* ---- Section bg via CSS custom property (sem animar body) ---- */
+  /* ---- Section bg via CSS custom property (7 instâncias ST) ---- */
   const sections = [
     { el: '.section-services',     bg: '#050505' },
     { el: '.section-stats',        bg: '#000' },
@@ -160,8 +190,6 @@ let lenis;
   });
 
   /* ---- Service cards 3D tilt: gsap.quickTo ---- */
-  /* ANTES: gsap.to() a cada mousemove = centenas de tweens/s        */
-  /* AGORA: quickTo reutiliza o mesmo tween                          */
   document.querySelectorAll('.service-card').forEach(card => {
     gsap.set(card, { transformPerspective: 800 });
     const rotY = gsap.quickTo(card, 'rotateY', { duration:0.35, ease:'power2.out' });
@@ -181,32 +209,17 @@ let lenis;
   const counters = document.querySelectorAll('.count');
   if (!counters.length) return;
   const fmt = (n) => n >= 1000 ? (n / 1000).toFixed(0) + '.000' : n.toString();
-  new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      const target = parseInt(el.dataset.target, 10);
-      const start = performance.now();
-      (function step(now) {
-        const p = Math.min((now - start) / 2000, 1);
-        el.textContent = fmt(Math.round((1 - Math.pow(1 - p, 3)) * target));
-        if (p < 1) requestAnimationFrame(step);
-        else el.textContent = fmt(target);
-      })(start);
-      entry.target._observer?.unobserve(el);
-    });
-  }, { threshold: 0.5 }).observe(document.querySelector('.count') || document.body);
   counters.forEach(c => {
-    new IntersectionObserver(([e]) => {
+    new IntersectionObserver(([e], obs) => {
       if (!e.isIntersecting) return;
+      obs.unobserve(c);
       const target = parseInt(c.dataset.target, 10);
       const start = performance.now();
-      const fmt2 = (n) => n >= 1000 ? (n / 1000).toFixed(0) + '.000' : n.toString();
       (function step(now) {
         const p = Math.min((now - start) / 2000, 1);
-        c.textContent = fmt2(Math.round((1 - Math.pow(1 - p, 3)) * target));
+        c.textContent = fmt(Math.round((1 - Math.pow(1 - p, 3)) * target));
         if (p < 1) requestAnimationFrame(step);
-        else c.textContent = fmt2(target);
+        else c.textContent = fmt(target);
       })(start);
     }, { threshold: 0.5 }).observe(c);
   });
@@ -362,12 +375,20 @@ let lenis;
         '<div class="blog-card-meta"><span>' + p.date + '</span><span>' + (p.readTime||'3 min de leitura') + '</span></div>' +
         '</div></article>'
       ).join('');
-      if (typeof ScrollTrigger !== 'undefined') {
-        ScrollTrigger.batch(grid.querySelectorAll('.blog-card'), {
-          start: 'top 92%', once: true,
-          onEnter: batch => gsap.fromTo(batch, { opacity:0, y:40 }, { opacity:1, y:0, duration:0.65, ease:'power3.out', stagger:0.1 }),
-        });
-      }
+      /* Aplica reveal nos cards carregados dinamicamente */
+      grid.querySelectorAll('.blog-card').forEach((el, idx) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(48px)';
+        el.style.transition = 'none';
+        new IntersectionObserver(([e], obs) => {
+          if (!e.isIntersecting) return;
+          obs.unobserve(el);
+          const delay = Math.min(idx * 100, 300);
+          el.style.transition = `opacity 0.65s ease ${delay}ms, transform 0.65s cubic-bezier(0.22,1,0.36,1) ${delay}ms`;
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }, { threshold: 0.05 }).observe(el);
+      });
     })
     .catch(() => {
       grid.innerHTML = [
