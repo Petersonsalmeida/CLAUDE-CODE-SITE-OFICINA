@@ -492,6 +492,8 @@ address { font-style: normal; }
   border-radius: 50%;
   border: 1px solid rgba(204,26,26,0.12);
   opacity: 0;
+  will-change: transform;
+  contain: layout style;
 }
 .emblem-ring--outer {
   width: 330px;
@@ -646,6 +648,8 @@ address { font-style: normal; }
   gap: 0;
   animation: marquee-scroll 28s linear infinite;
   white-space: nowrap;
+  will-change: transform;
+  contain: layout style;
 }
 .marquee-track span {
   font-size: 13px;

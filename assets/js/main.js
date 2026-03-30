@@ -1,6 +1,7 @@
 /* ============================================================
    ALIANÇA CENTRO AUTOMOTIVO — Main JavaScript
    GSAP ScrollTrigger · Lenis Smooth Scroll · Interactivity
+   v2 — Performance: ScrollTrigger.batch, quickTo, scrub 1.5
    ============================================================ */
 
 'use strict';
@@ -25,7 +26,6 @@ let lenis;
     wheelMultiplier: 1.1,
     touchMultiplier: 1.5,
   });
-  // Use ONLY GSAP ticker — no separate RAF loop to avoid double-call
   if (typeof gsap !== 'undefined') {
     gsap.ticker.add((time) => { lenis.raf(time * 1000); });
     gsap.ticker.lagSmoothing(0);
@@ -42,15 +42,9 @@ let lenis;
   if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
   gsap.registerPlugin(ScrollTrigger);
 
-  /* ---- Hero V2 animation ---- */
-  // Stagger hero title lines
+  /* ---- Hero animation ---- */
   document.querySelectorAll('.hh-line').forEach((line, i) => {
-    gsap.to(line, {
-      opacity: 1, y: 0,
-      duration: 0.85,
-      ease: 'power3.out',
-      delay: 1.6 + i * 0.15,
-    });
+    gsap.to(line, { opacity:1, y:0, duration:0.85, ease:'power3.out', delay:1.6 + i * 0.15 });
   });
   gsap.fromTo('.hero-kicker',  { opacity:0, y:14 }, { opacity:1, y:0, duration:0.65, ease:'power2.out', delay:1.5 });
   gsap.fromTo('.hero-desc',    { opacity:0, y:18 }, { opacity:1, y:0, duration:0.65, ease:'power2.out', delay:2.0 });
@@ -62,159 +56,86 @@ let lenis;
     gsap.to(el, { opacity:1, y:0, duration:0.55, ease:'power2.out', delay:2.3 + i * 0.15 });
   });
 
-  /* ---- Scroll-triggered reveals ---- */
-  // .reveal-up — slide up + fade
-  document.querySelectorAll('.reveal-up').forEach(el => {
-    const delay = parseFloat(el.dataset.delay || 0) * 0.1;
-    gsap.fromTo(el,
-      { opacity: 0, y: 36 },
-      {
-        opacity: 1, y: 0,
-        duration: 0.85,
-        ease: 'power3.out',
-        delay,
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 88%',
-          toggleActions: 'play none none none',
-        }
-      }
-    );
+  /* ---- Scroll reveals: ScrollTrigger.batch ---- */
+  /* ANTES: 1 ScrollTrigger por elemento (~73 instâncias)            */
+  /* AGORA: 1 instância por grupo — reduz 73 → ~12 instâncias        */
+
+  ScrollTrigger.batch('.reveal-up', {
+    start: 'top 90%',
+    once: true,
+    onEnter: batch => gsap.fromTo(batch,
+      { opacity:0, y:36 },
+      { opacity:1, y:0, duration:0.75, ease:'power3.out', stagger:0.07, overwrite:true }
+    ),
   });
 
-  // .reveal-right — slide from right
-  document.querySelectorAll('.reveal-right').forEach(el => {
-    gsap.fromTo(el,
-      { opacity: 0, x: 56 },
-      {
-        opacity: 1, x: 0,
-        duration: 1,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 82%',
-          toggleActions: 'play none none none',
-        }
-      }
-    );
+  ScrollTrigger.batch('.reveal-right', {
+    start: 'top 85%',
+    once: true,
+    onEnter: batch => gsap.fromTo(batch,
+      { opacity:0, x:56 },
+      { opacity:1, x:0, duration:0.9, ease:'power3.out', stagger:0.08, overwrite:true }
+    ),
   });
 
-  // .reveal-card — staggered cards
-  document.querySelectorAll('.service-card.reveal-card').forEach((el, i) => {
-    gsap.fromTo(el,
-      { opacity: 0, y: 48 },
-      {
-        opacity: 1, y: 0,
-        duration: 0.7,
-        ease: 'power3.out',
-        delay: (i % 3) * 0.08,
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 90%',
-          toggleActions: 'play none none none',
-        }
-      }
-    );
+  ScrollTrigger.batch('.reveal-card', {
+    start: 'top 92%',
+    once: true,
+    onEnter: batch => gsap.fromTo(batch,
+      { opacity:0, y:48 },
+      { opacity:1, y:0, duration:0.65, ease:'power3.out', stagger:0.08, overwrite:true }
+    ),
   });
 
-  // .reveal-stat — stats
-  document.querySelectorAll('.reveal-stat').forEach((el, i) => {
-    gsap.fromTo(el,
-      { opacity: 0, y: 24 },
-      {
-        opacity: 1, y: 0,
-        duration: 0.65,
-        ease: 'power3.out',
-        delay: i * 0.1,
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        }
-      }
-    );
+  ScrollTrigger.batch('.reveal-stat', {
+    start: 'top 88%',
+    once: true,
+    onEnter: batch => gsap.fromTo(batch,
+      { opacity:0, y:24 },
+      { opacity:1, y:0, duration:0.6, ease:'power3.out', stagger:0.1, overwrite:true }
+    ),
   });
 
-  /* ---- Parallax on about image ---- */
+  ScrollTrigger.batch('.step-num', {
+    start: 'top 80%',
+    once: true,
+    onEnter: batch => gsap.fromTo(batch,
+      { opacity:0, scale:0.5 },
+      { opacity:1, scale:1, duration:0.6, ease:'back.out(1.5)', stagger:0.15, overwrite:true }
+    ),
+  });
+
+  ScrollTrigger.batch('.stat-num', {
+    start: 'top 88%',
+    once: true,
+    onEnter: batch => gsap.fromTo(batch,
+      { scale:0.7, opacity:0 },
+      { scale:1, opacity:1, duration:0.6, ease:'back.out(1.7)', stagger:0.1, overwrite:true }
+    ),
+  });
+
+  /* ---- Parallax about: scrub suavizado (1.5s) ---- */
   const aboutImg = document.querySelector('.about-img-frame');
   if (aboutImg) {
     gsap.fromTo(aboutImg,
       { y: 0 },
-      {
-        y: -40,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.section-about',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true,
-        }
-      }
-    );
-  }
-
-  /* ---- Hero car parallax on scroll ---- */
-  const heroCar = document.querySelector('.hero-visual');
-  if (heroCar) {
-    gsap.to(heroCar, {
-      y: 80,
-      opacity: 0,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '#hero',
-        start: 'top top',
+      { y: -30, ease:'none', scrollTrigger: {
+        trigger: '.section-about',
+        start: 'top bottom',
         end: 'bottom top',
-        scrub: true,
-      }
-    });
+        scrub: 1.5,
+      }}
+    );
   }
 
-  /* ---- Stat numbers scale on enter ---- */
-  document.querySelectorAll('.stat-num').forEach(el => {
-    gsap.fromTo(el,
-      { scale: 0.7, opacity: 0 },
-      {
-        scale: 1, opacity: 1,
-        duration: 0.6,
-        ease: 'back.out(1.7)',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        }
-      }
-    );
-  });
-
-  /* ---- Service cards 3D tilt ---- */
-  document.querySelectorAll('.service-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = (e.clientX - cx) / (rect.width / 2);
-      const dy = (e.clientY - cy) / (rect.height / 2);
-      gsap.to(card, {
-        rotateY: dx * 6,
-        rotateX: -dy * 6,
-        duration: 0.3,
-        ease: 'power2.out',
-        transformPerspective: 800,
-      });
-    });
-    card.addEventListener('mouseleave', () => {
-      gsap.to(card, { rotateY: 0, rotateX: 0, duration: 0.5, ease: 'elastic.out(1, 0.6)' });
-    });
-  });
-
-  /* ---- Nav background colour shift on scroll ---- */
+  /* ---- Nav scrolled state ---- */
   ScrollTrigger.create({
     start: 60,
     onEnter: () => document.getElementById('navbar')?.classList.add('scrolled'),
     onLeaveBack: () => document.getElementById('navbar')?.classList.remove('scrolled'),
   });
 
-  /* ---- Section background colour scroll shift ---- */
+  /* ---- Section bg via CSS custom property (sem animar body) ---- */
   const sections = [
     { el: '.section-services',     bg: '#050505' },
     { el: '.section-stats',        bg: '#000' },
@@ -227,7 +148,6 @@ let lenis;
   sections.forEach(({ el, bg }) => {
     const node = document.querySelector(el);
     if (!node) return;
-    // Usa CSS custom property em vez de animar backgroundColor no body (evita repaint)
     ScrollTrigger.create({
       trigger: node,
       start: 'top 60%',
@@ -239,22 +159,19 @@ let lenis;
     });
   });
 
-  /* ---- Process step numbers draw in ---- */
-  document.querySelectorAll('.step-num').forEach((el, i) => {
-    gsap.fromTo(el,
-      { opacity: 0, scale: 0.5 },
-      {
-        opacity: 1, scale: 1,
-        duration: 0.6,
-        ease: 'back.out(1.5)',
-        delay: i * 0.15,
-        scrollTrigger: {
-          trigger: '.section-process',
-          start: 'top 75%',
-          toggleActions: 'play none none none',
-        }
-      }
-    );
+  /* ---- Service cards 3D tilt: gsap.quickTo ---- */
+  /* ANTES: gsap.to() a cada mousemove = centenas de tweens/s        */
+  /* AGORA: quickTo reutiliza o mesmo tween                          */
+  document.querySelectorAll('.service-card').forEach(card => {
+    gsap.set(card, { transformPerspective: 800 });
+    const rotY = gsap.quickTo(card, 'rotateY', { duration:0.35, ease:'power2.out' });
+    const rotX = gsap.quickTo(card, 'rotateX', { duration:0.35, ease:'power2.out' });
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      rotY(((e.clientX - r.left - r.width  / 2) / (r.width  / 2)) * 6);
+      rotX(((e.clientY - r.top  - r.height / 2) / (r.height / 2)) * -6);
+    });
+    card.addEventListener('mouseleave', () => { rotY(0); rotX(0); });
   });
 
 })();
@@ -263,96 +180,75 @@ let lenis;
 (function initCounters() {
   const counters = document.querySelectorAll('.count');
   if (!counters.length) return;
-
-  const formatNum = (n) => n >= 1000 ? (n / 1000).toFixed(0) + '.000' : n.toString();
-
-  const observer = new IntersectionObserver((entries) => {
+  const fmt = (n) => n >= 1000 ? (n / 1000).toFixed(0) + '.000' : n.toString();
+  new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
       const el = entry.target;
       const target = parseInt(el.dataset.target, 10);
-      const dur = 2000;
       const start = performance.now();
-
-      function step(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / dur, 1);
-        // Ease out cubic
-        const ease = 1 - Math.pow(1 - progress, 3);
-        const current = Math.round(ease * target);
-        el.textContent = formatNum(current);
-        if (progress < 1) requestAnimationFrame(step);
-        else el.textContent = formatNum(target);
-      }
-      requestAnimationFrame(step);
-      observer.unobserve(el);
+      (function step(now) {
+        const p = Math.min((now - start) / 2000, 1);
+        el.textContent = fmt(Math.round((1 - Math.pow(1 - p, 3)) * target));
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = fmt(target);
+      })(start);
+      entry.target._observer?.unobserve(el);
     });
-  }, { threshold: 0.5 });
-
-  counters.forEach(c => observer.observe(c));
+  }, { threshold: 0.5 }).observe(document.querySelector('.count') || document.body);
+  counters.forEach(c => {
+    new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      const target = parseInt(c.dataset.target, 10);
+      const start = performance.now();
+      const fmt2 = (n) => n >= 1000 ? (n / 1000).toFixed(0) + '.000' : n.toString();
+      (function step(now) {
+        const p = Math.min((now - start) / 2000, 1);
+        c.textContent = fmt2(Math.round((1 - Math.pow(1 - p, 3)) * target));
+        if (p < 1) requestAnimationFrame(step);
+        else c.textContent = fmt2(target);
+      })(start);
+    }, { threshold: 0.5 }).observe(c);
+  });
 })();
 
 /* ---- TESTIMONIALS CAROUSEL ------------------------------- */
 (function initTestimonials() {
   const track = document.getElementById('tTrack');
   if (!track) return;
-
   const cards = track.querySelectorAll('.tcard');
   const dotsContainer = document.querySelector('.t-dots');
   const prevBtn = document.querySelector('.t-prev');
   const nextBtn = document.querySelector('.t-next');
   if (!cards.length || !dotsContainer) return;
 
-  let current = 0;
-  let autoTimer;
-  let isDragging = false;
-  let dragStart = 0;
-  let dragDelta = 0;
+  let current = 0, autoTimer, dragStart = 0, isDragging = false, dragDelta = 0;
 
-  // Build dots
   cards.forEach((_, i) => {
     const dot = document.createElement('button');
     dot.className = 't-dot' + (i === 0 ? ' active' : '');
-    dot.setAttribute('role', 'tab');
-    dot.setAttribute('aria-label', `Depoimento ${i + 1}`);
+    dot.setAttribute('aria-label', 'Depoimento ' + (i + 1));
     dot.addEventListener('click', () => goTo(i));
     dotsContainer.appendChild(dot);
   });
 
   function getVisible() {
-    const w = window.innerWidth;
-    if (w <= 768) return 1;
-    if (w <= 1024) return 2;
-    return 3;
+    return window.innerWidth <= 768 ? 1 : window.innerWidth <= 1024 ? 2 : 3;
   }
-
   function goTo(idx) {
-    const vis = getVisible();
-    const max = Math.max(0, cards.length - vis);
+    const max = Math.max(0, cards.length - getVisible());
     current = Math.max(0, Math.min(idx, max));
-    const cardW = cards[0].offsetWidth + 20; // gap = 20px
-    if (typeof gsap !== 'undefined') {
-      gsap.to(track, { x: -current * cardW, duration: 0.65, ease: 'power3.out' });
-    } else {
-      track.style.transform = `translateX(${-current * cardW}px)`;
-    }
-    // Update dots
-    dotsContainer.querySelectorAll('.t-dot').forEach((d, i) => {
-      d.classList.toggle('active', i === current);
-    });
+    const cardW = cards[0].offsetWidth + 20;
+    if (typeof gsap !== 'undefined') gsap.to(track, { x: -current * cardW, duration:0.65, ease:'power3.out' });
+    else track.style.transform = 'translateX(' + (-current * cardW) + 'px)';
+    dotsContainer.querySelectorAll('.t-dot').forEach((d, i) => d.classList.toggle('active', i === current));
   }
 
-  function next() { goTo(current + 1); }
-  function prev() { goTo(current - 1); }
-
-  prevBtn?.addEventListener('click', () => { prev(); resetAuto(); });
-  nextBtn?.addEventListener('click', () => { next(); resetAuto(); });
-
-  // Auto-advance
-  function startAuto() { autoTimer = setInterval(next, 5000); }
+  prevBtn?.addEventListener('click', () => { goTo(current - 1); resetAuto(); });
+  nextBtn?.addEventListener('click', () => { goTo(current + 1); resetAuto(); });
+  function startAuto() { autoTimer = setInterval(() => goTo(current + 1), 5000); }
   function resetAuto() { clearInterval(autoTimer); startAuto(); }
 
-  // Drag / swipe
   const wrap = track.closest('.testimonials-wrap');
   if (wrap) {
     wrap.addEventListener('mousedown', e => { isDragging = true; dragStart = e.clientX; });
@@ -360,28 +256,23 @@ let lenis;
     wrap.addEventListener('mouseup', () => {
       if (!isDragging) return;
       isDragging = false;
-      if (dragDelta < -50) next();
-      else if (dragDelta > 50) prev();
-      dragDelta = 0;
-      resetAuto();
+      if (dragDelta < -50) goTo(current + 1);
+      else if (dragDelta > 50) goTo(current - 1);
+      dragDelta = 0; resetAuto();
     });
-    wrap.addEventListener('mouseleave', () => { if (isDragging) { isDragging = false; dragDelta = 0; } });
-
-    // Touch
-    wrap.addEventListener('touchstart', e => { dragStart = e.touches[0].clientX; }, { passive: true });
+    wrap.addEventListener('mouseleave', () => { isDragging = false; });
+    wrap.addEventListener('touchstart', e => { dragStart = e.touches[0].clientX; }, { passive:true });
     wrap.addEventListener('touchend', e => {
       const delta = e.changedTouches[0].clientX - dragStart;
-      if (delta < -50) next();
-      else if (delta > 50) prev();
+      if (delta < -50) goTo(current + 1);
+      else if (delta > 50) goTo(current - 1);
       resetAuto();
     });
   }
 
-  // Recalc on resize
-  window.addEventListener('resize', () => goTo(current));
-
-  startAuto();
-  goTo(0);
+  let resizeTimer;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => goTo(current), 150); });
+  startAuto(); goTo(0);
 })();
 
 /* ---- MOBILE MENU ----------------------------------------- */
@@ -389,24 +280,17 @@ let lenis;
   const burger = document.querySelector('.nav-burger');
   const overlay = document.querySelector('.mobile-overlay');
   if (!burger || !overlay) return;
-
-  function toggle() {
-    const isOpen = !overlay.classList.contains('open');
-    overlay.classList.toggle('open', isOpen);
-    overlay.style.display = isOpen ? 'flex' : 'none';
-    burger.classList.toggle('open', isOpen);
-    burger.setAttribute('aria-expanded', isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-  }
   function close() {
-    overlay.classList.remove('open');
-    overlay.style.display = 'none';
-    burger.classList.remove('open');
-    burger.setAttribute('aria-expanded', 'false');
+    overlay.classList.remove('open'); overlay.style.display = 'none';
+    burger.classList.remove('open'); burger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
   }
-
-  burger.addEventListener('click', toggle);
+  burger.addEventListener('click', () => {
+    const isOpen = !overlay.classList.contains('open');
+    overlay.classList.toggle('open', isOpen); overlay.style.display = isOpen ? 'flex' : 'none';
+    burger.classList.toggle('open', isOpen); burger.setAttribute('aria-expanded', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
   overlay.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 })();
@@ -420,11 +304,8 @@ let lenis;
       const target = document.querySelector(id);
       if (!target) return;
       e.preventDefault();
-      if (lenis) {
-        lenis.scrollTo(target, { offset: -70, duration: 1.4 });
-      } else {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      if (lenis) lenis.scrollTo(target, { offset: -70, duration: 1.2 });
+      else target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
 })();
@@ -435,50 +316,30 @@ let lenis;
   const btn = document.getElementById('formBtn');
   const successEl = document.getElementById('formSuccess');
   if (!form) return;
-
-  // Phone mask
   const phoneField = document.getElementById('f-wpp');
   if (phoneField) {
     phoneField.addEventListener('input', e => {
       let v = e.target.value.replace(/\D/g, '').slice(0, 11);
-      if (v.length >= 7)
-        v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
-      else if (v.length >= 3)
-        v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+      if (v.length >= 7)      v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+      else if (v.length >= 3) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
       e.target.value = v;
     });
   }
-
   form.addEventListener('submit', async e => {
     e.preventDefault();
     if (!form.checkValidity()) { form.reportValidity(); return; }
-
     btn?.classList.add('loading');
-
-    const data = new FormData(form);
-    const body = Object.fromEntries(data.entries());
-
+    const body = Object.fromEntries(new FormData(form).entries());
     try {
-      const res = await fetch('api/leads.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-
+      const res = await fetch('api/leads.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       if (res.ok) {
         form.style.display = 'none';
         if (successEl) successEl.removeAttribute('hidden');
-        // Track conversion (optional, replace with your analytics)
         if (typeof gtag === 'function') gtag('event', 'lead', { event_category: 'form' });
-      } else {
-        throw new Error('Erro no servidor');
-      }
-    } catch (err) {
-      // Fallback: open WhatsApp with prefilled message
-      const nome = body.nome || '';
-      const servico = body.servico || '';
-      const msg = encodeURIComponent(`Olá! Me chamo ${nome} e gostaria de um orçamento para ${servico}.`);
-      window.open(`https://wa.me/5551994687074?text=${msg}`, '_blank');
+      } else throw new Error();
+    } catch {
+      const msg = encodeURIComponent('Olá! Me chamo ' + (body.nome||'') + ' e gostaria de um orçamento para ' + (body.servico||'') + '.');
+      window.open('https://wa.me/5551994687074?text=' + msg, '_blank');
       btn?.classList.remove('loading');
     }
   });
@@ -488,90 +349,47 @@ let lenis;
 (function loadBlogPosts() {
   const grid = document.getElementById('blogGrid');
   if (!grid) return;
-
   fetch('api/posts.php?limit=3')
     .then(r => r.json())
     .then(posts => {
-      if (!posts || !posts.length) {
-        grid.innerHTML = `<p style="color:var(--text-3);font-size:14px;grid-column:1/-1">Em breve novos artigos. Fique ligado!</p>`;
-        return;
-      }
-      grid.innerHTML = posts.map(p => `
-        <article class="blog-card reveal-card">
-          <div class="blog-card-img-wrap">
-            <img class="blog-card-img" src="${p.image || 'assets/images/blog-placeholder.jpg'}" alt="${p.title}" loading="lazy">
-          </div>
-          <div class="blog-card-body">
-            <p class="blog-card-cat">${p.category || 'Dicas'}</p>
-            <h3 class="blog-card-title"><a href="/blog/${p.slug}">${p.title}</a></h3>
-            <p class="blog-card-excerpt">${p.excerpt}</p>
-            <div class="blog-card-meta">
-              <span>${p.date}</span>
-              <span>${p.readTime || '3 min de leitura'}</span>
-            </div>
-          </div>
-        </article>
-      `).join('');
-
-      // Animate newly added cards
-      if (typeof gsap !== 'undefined') {
-        grid.querySelectorAll('.blog-card').forEach((card, i) => {
-          gsap.fromTo(card,
-            { opacity: 0, y: 40 },
-            {
-              opacity: 1, y: 0,
-              duration: 0.7,
-              ease: 'power3.out',
-              delay: i * 0.1,
-              scrollTrigger: { trigger: card, start: 'top 90%' }
-            }
-          );
+      if (!posts?.length) { grid.innerHTML = '<p style="color:var(--text-3);font-size:14px;grid-column:1/-1">Em breve novos artigos.</p>'; return; }
+      grid.innerHTML = posts.map(p =>
+        '<article class="blog-card reveal-card">' +
+        '<div class="blog-card-img-wrap"><img class="blog-card-img" src="' + (p.image||'assets/images/blog-placeholder.jpg') + '" alt="' + p.title + '" loading="lazy"></div>' +
+        '<div class="blog-card-body"><p class="blog-card-cat">' + (p.category||'Dicas') + '</p>' +
+        '<h3 class="blog-card-title"><a href="/blog/' + p.slug + '">' + p.title + '</a></h3>' +
+        '<p class="blog-card-excerpt">' + p.excerpt + '</p>' +
+        '<div class="blog-card-meta"><span>' + p.date + '</span><span>' + (p.readTime||'3 min de leitura') + '</span></div>' +
+        '</div></article>'
+      ).join('');
+      if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.batch(grid.querySelectorAll('.blog-card'), {
+          start: 'top 92%', once: true,
+          onEnter: batch => gsap.fromTo(batch, { opacity:0, y:40 }, { opacity:1, y:0, duration:0.65, ease:'power3.out', stagger:0.1 }),
         });
       }
     })
     .catch(() => {
-      // Show placeholder cards on API error
-      grid.innerHTML = `
-        <article class="blog-card reveal-card">
-          <div class="blog-card-img-wrap" style="background:var(--bg-elevated)"></div>
-          <div class="blog-card-body">
-            <p class="blog-card-cat">Dicas</p>
-            <h3 class="blog-card-title">Como proteger a pintura do seu carro no inverno</h3>
-            <p class="blog-card-excerpt">O inverno pode ser agressivo para a pintura do seu veículo. Saiba como protegê-la com medidas simples e eficazes.</p>
-            <div class="blog-card-meta"><span>Em breve</span></div>
-          </div>
-        </article>
-        <article class="blog-card reveal-card">
-          <div class="blog-card-img-wrap" style="background:var(--bg-elevated)"></div>
-          <div class="blog-card-body">
-            <p class="blog-card-cat">Tecnologia</p>
-            <h3 class="blog-card-title">Vitrificação vs. Cera: qual vale mais a pena?</h3>
-            <p class="blog-card-excerpt">Entenda as diferenças entre vitrificação cerâmica e cera tradicional e qual é o melhor custo-benefício para seu carro.</p>
-            <div class="blog-card-meta"><span>Em breve</span></div>
-          </div>
-        </article>
-        <article class="blog-card reveal-card">
-          <div class="blog-card-img-wrap" style="background:var(--bg-elevated)"></div>
-          <div class="blog-card-body">
-            <p class="blog-card-cat">Manutenção</p>
-            <h3 class="blog-card-title">Martelinho de Ouro: quando usar e quando não usar</h3>
-            <p class="blog-card-excerpt">A técnica PDR é incrível para certos tipos de amassados, mas não funciona em todos os casos. Veja quando vale a pena.</p>
-            <div class="blog-card-meta"><span>Em breve</span></div>
-          </div>
-        </article>
-      `;
+      grid.innerHTML = [
+        ['Dicas','Como proteger a pintura do seu carro no inverno','O inverno pode ser agressivo para a pintura. Saiba como protegê-la.'],
+        ['Tecnologia','Vitrificação vs. Cera: qual vale mais a pena?','Entenda as diferenças e o melhor custo-benefício para seu carro.'],
+        ['Manutenção','Martelinho de Ouro: quando usar e quando não usar','A técnica PDR é incrível para certos amassados, mas não é universal.'],
+      ].map(([cat,title,exc]) =>
+        '<article class="blog-card"><div class="blog-card-img-wrap" style="background:var(--bg-elevated)"></div>' +
+        '<div class="blog-card-body"><p class="blog-card-cat">' + cat + '</p><h3 class="blog-card-title">' + title + '</h3>' +
+        '<p class="blog-card-excerpt">' + exc + '</p></div></article>'
+      ).join('');
     });
 })();
 
-/* ---- BACK TO TOP ----------------------------------------- */
+/* ---- BACK TO TOP — IntersectionObserver (sem scroll listener) ---- */
 (function initBackTop() {
   const btn = document.getElementById('backTop');
   if (!btn) return;
-
-  window.addEventListener('scroll', () => {
-    btn.classList.toggle('visible', window.scrollY > 600);
-  }, { passive: true });
-
+  const sentinel = document.createElement('div');
+  sentinel.style.cssText = 'position:absolute;top:600px;left:0;width:1px;height:1px;pointer-events:none;';
+  document.body.prepend(sentinel);
+  new IntersectionObserver(([e]) => btn.classList.toggle('visible', !e.isIntersecting)).observe(sentinel);
   btn.addEventListener('click', () => {
     if (lenis) lenis.scrollTo(0, { duration: 1.2 });
     else window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -582,22 +400,16 @@ let lenis;
 const ftYear = document.getElementById('ftYear');
 if (ftYear) ftYear.textContent = new Date().getFullYear();
 
-/* ---- ACTIVE NAV LINK ON SCROLL --------------------------- */
+/* ---- ACTIVE NAV LINK ---- */
 (function initActiveNav() {
-  const sections = document.querySelectorAll('section[id]');
+  const navSections = document.querySelectorAll('section[id]');
   const links = document.querySelectorAll('.nav-links a[href^="#"]');
-  if (!sections.length || !links.length) return;
-
-  const observer = new IntersectionObserver(entries => {
+  if (!navSections.length || !links.length) return;
+  const obs = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      links.forEach(a => {
-        a.style.color = a.getAttribute('href') === '#' + entry.target.id
-          ? 'var(--text)'
-          : '';
-      });
+      links.forEach(a => { a.style.color = a.getAttribute('href') === '#' + entry.target.id ? 'var(--text)' : ''; });
     });
   }, { rootMargin: '-40% 0px -55% 0px' });
-
-  sections.forEach(s => observer.observe(s));
+  navSections.forEach(s => obs.observe(s));
 })();
