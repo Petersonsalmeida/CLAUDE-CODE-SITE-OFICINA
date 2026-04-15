@@ -132,7 +132,8 @@ let lenis;
 
   /* ---- Hero animation ---- */
   document.querySelectorAll('.hh-line').forEach((line, i) => {
-    gsap.to(line, { opacity:1, y:0, duration:0.85, ease:'power3.out', delay:1.6 + i * 0.15 });
+    gsap.to(line, { opacity:1, y:0, duration:0.85, ease:'power3.out', delay:1.6 + i * 0.15,
+      onComplete: () => { line.style.willChange = 'auto'; } });
   });
   gsap.fromTo('.hero-kicker',  { opacity:0, y:14 }, { opacity:1, y:0, duration:0.65, ease:'power2.out', delay:1.5 });
   gsap.fromTo('.hero-desc',    { opacity:0, y:18 }, { opacity:1, y:0, duration:0.65, ease:'power2.out', delay:2.0 });
