@@ -172,7 +172,8 @@ address { font-style: normal; }
   color: var(--text-2);
   transition: color 0.2s;
 }
-.nav-links a:hover { color: var(--text); }
+.nav-links a:hover,
+.nav-links a.active { color: var(--text); }
 .nav-cta {
   flex-shrink: 0;
   padding: 8px 18px;
