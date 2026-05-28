@@ -116,13 +116,23 @@
   <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#CC1A1A">
 
-  <!-- Google Analytics GA4 -->
+  <!-- Google Analytics GA4 + Google Ads -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-S9CEX8HTG3"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-S9CEX8HTG3');
+    gtag('config', 'AW-11263586949');
+  </script>
+
+  <!-- Event snippet for Visualização de página conversion page -->
+  <script>
+    gtag('event', 'conversion', {
+        'send_to': 'AW-11263586949/ogW0CJ2OiLUcEIXl8vop',
+        'value': 1.0,
+        'currency': 'BRL'
+    });
   </script>
 
   <!-- Preconnect crítico -->

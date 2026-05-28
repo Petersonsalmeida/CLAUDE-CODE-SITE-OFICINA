@@ -52,13 +52,23 @@ if ($post && is_dir(__DIR__ . '/../data/posts/')) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-  <!-- Google Analytics GA4 -->
+  <!-- Google Analytics GA4 + Google Ads -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-S9CEX8HTG3"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-S9CEX8HTG3');
+    gtag('config', 'AW-11263586949');
+  </script>
+
+  <!-- Event snippet for Visualização de página conversion page -->
+  <script>
+    gtag('event', 'conversion', {
+        'send_to': 'AW-11263586949/ogW0CJ2OiLUcEIXl8vop',
+        'value': 1.0,
+        'currency': 'BRL'
+    });
   </script>
   <link rel="stylesheet" href="/assets/css/style.css">
   <style>
