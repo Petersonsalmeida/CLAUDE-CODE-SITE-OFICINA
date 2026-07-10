@@ -553,7 +553,7 @@
           O padrão premium que seu veículo merece — com prazo e garantia.
         </p>
         <div class="hero-actions">
-          <a href="#orcamento" class="btn btn-primary btn-lg" id="waGateOpen">
+          <a href="javascript:void(0)" class="btn btn-primary btn-lg" id="waGateOpen">
             Pedir orçamento no WhatsApp
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
@@ -1274,7 +1274,7 @@ var gate=document.getElementById("waGate"),opener=document.getElementById("waGat
 function track(ev){try{if(typeof gtag==="function"){gtag("event",ev,{event_category:"lead"});}}catch(e){}}
 function show(){gate.style.display="flex";setTimeout(function(){nameI.focus();},60);track("whatsapp_gate_open");}
 function hide(){gate.style.display="none";}
-if(opener){opener.addEventListener("click",function(e){e.preventDefault();show();});}
+if(opener){opener.addEventListener("click",function(e){e.preventDefault();e.stopImmediatePropagation();show();});}
 if(closeB){closeB.addEventListener("click",hide);}
 gate.addEventListener("click",function(e){if(e.target===gate){hide();}});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){hide();}});
